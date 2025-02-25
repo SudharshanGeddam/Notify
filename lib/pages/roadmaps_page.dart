@@ -13,7 +13,6 @@ class _RoadmapsPageState extends State<RoadmapsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("RoadMaps"),
-        backgroundColor: Colors.purple,
       ),
     );
   }

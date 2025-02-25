@@ -17,7 +17,6 @@ class PreferencesPageState extends State<PreferencesPage> {
       appBar: AppBar(
         title: const Text('Preferences'),
         centerTitle: true,
-        backgroundColor: Colors.indigoAccent,
       ),
       body: SingleChildScrollView(
         child: Column(

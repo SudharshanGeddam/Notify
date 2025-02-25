@@ -1,7 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:notify/data/api_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -12,6 +12,28 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   File? _image;
+
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController dobController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    Map<String, dynamic> userData =
+        (await ApiService.getProfile()) as Map<String, dynamic>;
+    setState(() {
+      nameController.text = userData['fullName'] ?? '';
+      emailController.text = userData['email'] ?? '';
+      dobController.text = userData['dob'];
+      phoneController.text = userData['phoneNo'] ?? '';
+    });
+  }
 
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -30,7 +52,6 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         title: Text('Profile'),
         centerTitle: true,
-        backgroundColor: Colors.purple,
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -127,29 +148,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     )),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: TextField(
-                decoration: InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: Icon(Icons.visibility, color: Colors.grey),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16.0),
-                    )),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: TextField(
-                decoration: InputDecoration(
-                    labelText: 'Intrests',
-                    prefixIcon:
-                        Icon(Icons.interests_rounded, color: Colors.grey),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16.0),
-                    )),
-              ),
-            )
+            ElevatedButton(onPressed: () {}, child: Text("Save"))
           ],
         ),
       ),

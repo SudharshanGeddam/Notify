@@ -3,6 +3,7 @@ import 'package:notify/data/api_service.dart';
 import 'package:notify/pages/forgot_password_page.dart';
 
 import 'package:notify/screens/register_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,6 +18,11 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  Future<void> saveLoginState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool("isLoggedIn", true);
+  }
+
   Future<void> loginUser() async {
     final result = await ApiService.loginUSer(
         emailController.text, passwordController.text);
@@ -28,6 +34,8 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     if (result != null && result["success"]) {
+      await saveLoginState();
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Login Successful!"),

@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:notify/app_widgets/pageview_home.dart';
 import 'package:notify/app_widgets/side_nav_bar_widget.dart';
-
+import 'package:notify/data/api_service.dart';
 import 'package:notify/data/notifiers.dart';
+import 'package:notify/data/theme_toggle_icon.dart';
 import 'package:notify/pages/exams_page.dart';
 import 'package:notify/pages/roadmaps_page.dart';
 import 'package:notify/pages/sports_page.dart';
@@ -15,47 +19,124 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  Future<Map<String, dynamic>?> _fetchProfile() async {
+    final http.Response? response = await ApiService.getProfile();
+    if (response != null && response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Expanded(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.asset(
-                  "assets/images/notify-logo.png",
-                  width: 200,
-                  height: 200,
-                  fit: BoxFit.cover,
-                ),
-              )
-            ],
-          ),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                "assets/images/notify-logo.png",
+                width: 200,
+                height: 200,
+                fit: BoxFit.cover,
+              ),
+            )
+          ],
         ),
         centerTitle: true,
         actions: [
           IconButton(
-              onPressed: () {
-                isLightModeNotifier.value = !isLightModeNotifier.value;
-              },
-              icon: ValueListenableBuilder(
-                valueListenable: isLightModeNotifier,
-                builder: (context, isLightMode, child) {
-                  return Icon(isLightMode ? Icons.dark_mode : Icons.light_mode);
-                },
-              ))
+            onPressed: () {
+              isLightModeNotifier.value = !isLightModeNotifier.value;
+            },
+            icon: ThemeToggleIcon(),
+          ),
         ],
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 100),
-          const PageviewHome(),
-          const SizedBox(height: 50),
-          const Expanded(child: OpenViews()),
-        ],
+      body: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height -
+                kToolbarHeight -
+                MediaQuery.of(context).padding.top,
+          ),
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 20,
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: FutureBuilder<Map<String, dynamic>?>(
+                  future: _fetchProfile(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (snapshot.hasError || !snapshot.hasData) {
+                      return const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text("Welcome, Guest!"),
+                      );
+                    } else {
+                      final user = snapshot.data!['user'];
+                      final fullName =
+                          (user != null && user['fullName'] != null)
+                              ? user['fullName']
+                              : "Guest";
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const SizedBox(height: 50),
+                              Padding(
+                                padding: EdgeInsets.only(left: 25.0),
+                                child: Text(
+                                  "Welcome, ",
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'assets/fonts/Inter'),
+                                ),
+                              ),
+                              Text(
+                                "$fullName...👋",
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 25.0),
+                            child: Text(
+                              "Treding on Notify...🔥 ",
+                              textAlign: TextAlign.left,
+                              style: const TextStyle(
+                                  fontSize: 18,
+                                  fontStyle: FontStyle.italic,
+                                  fontFamily: 'assets/fonts/Inter'),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+              const PageviewHome(),
+              const SizedBox(height: 50),
+              OpenViews(),
+            ],
+          ),
+        ),
       ),
       drawer: const SideNavDrawerView(),
     );
@@ -72,101 +153,117 @@ class OpenViews extends StatefulWidget {
 class OpenViewState extends State<OpenViews> {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        children: [
-          SizedBox(
-            height: 60,
-            width: 300,
-            child: FilledButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return SportsPage();
-                }));
-              },
-              style: FilledButton.styleFrom(
-                backgroundColor: Colors.white,
-                side: const BorderSide(color: Colors.white),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Image.asset('assets/images/trophy.png',
-                      width: 24, height: 24),
-                  const Text(
-                    "Sports",
-                    style: TextStyle(color: Colors.purple),
+    return ValueListenableBuilder(
+        valueListenable: isLightModeNotifier,
+        builder: (context, bool isLightMode, child) {
+          final buttonBackgroundColor =
+              isLightMode ? Colors.white : Colors.grey[800];
+          final buttonSideColor =
+              isLightMode ? Colors.black : (Colors.grey[800] ?? Colors.grey);
+          final textColor = isLightMode ? Colors.purple : Colors.white;
+          final arrowColor = isLightMode ? Colors.purple : Colors.white;
+
+          return Center(
+            child: Column(
+              children: [
+                SizedBox(height: 20),
+                SizedBox(
+                  height: 60,
+                  width: 300,
+                  child: FilledButton(
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return ExamsPage();
+                      }));
+                    },
+                    style: FilledButton.styleFrom(
+                      backgroundColor: buttonBackgroundColor,
+                      side: BorderSide(color: buttonSideColor),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Image.asset('assets/images/exam.png',
+                            width: 24, height: 24),
+                        Text(
+                          "Exams",
+                          style: TextStyle(color: textColor),
+                        ),
+                        Icon(Icons.arrow_forward, color: arrowColor),
+                      ],
+                    ),
                   ),
-                  Icon(Icons.arrow_forward, color: Colors.purple),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            height: 60,
-            width: 300,
-            child: FilledButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return ExamsPage();
-                }));
-              },
-              style: FilledButton.styleFrom(
-                backgroundColor: Colors.white,
-                side: const BorderSide(color: Colors.white),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
                 ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Image.asset('assets/images/exam.png', width: 24, height: 24),
-                  const Text(
-                    "Exams",
-                    style: TextStyle(color: Colors.purple),
+                const SizedBox(height: 20),
+                SizedBox(
+                  height: 60,
+                  width: 300,
+                  child: FilledButton(
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return SportsPage();
+                      }));
+                    },
+                    style: FilledButton.styleFrom(
+                      backgroundColor: buttonBackgroundColor,
+                      side: BorderSide(color: buttonSideColor),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Image.asset('assets/images/trophy.png',
+                            width: 24, height: 24),
+                        Text(
+                          "Sports",
+                          style: TextStyle(color: textColor),
+                        ),
+                        Icon(Icons.arrow_forward, color: arrowColor),
+                      ],
+                    ),
                   ),
-                  Icon(Icons.arrow_forward, color: Colors.purple),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            height: 60,
-            width: 300,
-            child: FilledButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return RoadmapsPage();
-                }));
-              },
-              style: FilledButton.styleFrom(
-                backgroundColor: Colors.white,
-                side: const BorderSide(color: Colors.white),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
                 ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Icon(Icons.map_sharp, color: Colors.green),
-                  const Text(
-                    "Roadmaps",
-                    style: TextStyle(color: Colors.purple),
+                const SizedBox(height: 20),
+                SizedBox(
+                  height: 60,
+                  width: 300,
+                  child: FilledButton(
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return RoadmapsPage();
+                      }));
+                    },
+                    style: FilledButton.styleFrom(
+                      backgroundColor: buttonBackgroundColor,
+                      side: BorderSide(color: buttonSideColor),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Icon(Icons.map_sharp, color: Colors.green),
+                        Text(
+                          "Roadmaps",
+                          style: TextStyle(color: textColor),
+                        ),
+                        Icon(Icons.arrow_forward, color: arrowColor),
+                      ],
+                    ),
                   ),
-                  Icon(Icons.arrow_forward, color: Colors.purple),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-    );
+          );
+        });
   }
 }

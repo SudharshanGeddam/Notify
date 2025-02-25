@@ -1,46 +1,99 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:notify/data/notifiers.dart';
 import 'package:notify/screens/login_screen.dart';
 import 'package:notify/screens/main_wrapper.dart';
+import 'package:notify/screens/offline_screen.dart';
 import 'package:notify/screens/register_screen.dart';
 import 'package:notify/screens/welcome_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  runApp(const MyApp());
+
+  final bool hasInternet = await checkInternetConnection();
+  final String initialRoute =
+      hasInternet ? (await getLoginState() ? '/home' : '/') : '/offline';
+
+  runApp(MyApp(initialRoute: initialRoute));
+}
+
+Future<bool> getLoginState() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getBool('isLoggedIn') ?? false;
+}
+
+Future<bool> checkInternetConnection() async {
+  var connectivityResult = await Connectivity().checkConnectivity();
+  return connectivityResult != [ConnectivityResult.none];
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute;
+  const MyApp({super.key, required this.initialRoute});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: isLightModeNotifier,
-        builder: (context, isLightMode, child) {
-          return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              title: 'Flutter Demo',
-              theme: ThemeData(
-                colorScheme: ColorScheme.fromSeed(
-                    seedColor: Colors.white,
-                    brightness:
-                        isLightMode ? Brightness.light : Brightness.dark),
-                useMaterial3: true,
-              ),
-              initialRoute: '/',
-              routes: {
-                '/': (context) => const WelcomeScreen(),
-                '/login': (context) => const LoginScreen(),
-                '/register': (context) => const RegisterScreen(),
-                '/home': (context) => const MainWrapper(),
-                '/sports': (context) => const MainWrapper(),
-                '/exams': (context) => const MainWrapper(),
-                'roadmaps': (context) => const MainWrapper(),
-              });
-        });
+      valueListenable: isLightModeNotifier,
+      builder: (context, isLightMode, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Notify',
+          theme: ThemeData(
+            brightness: Brightness.light,
+            primarySwatch: Colors.purple,
+            primaryColor: Colors.purple,
+            scaffoldBackgroundColor: Colors.grey[100],
+            appBarTheme: AppBarTheme(
+              backgroundColor: Colors.purple.shade700,
+              foregroundColor: Colors.white,
+            ),
+            colorScheme: ColorScheme.light(
+              primary: Colors.purple,
+              primaryContainer: Colors.purple.shade200,
+              secondary: Colors.deepPurpleAccent,
+              secondaryContainer: Colors.deepPurple.shade100,
+              onPrimary: Colors.white,
+              onSecondary: Colors.white,
+            ),
+            useMaterial3: true,
+          ),
+          darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            primarySwatch: Colors.purple,
+            primaryColor: Colors.purple,
+            scaffoldBackgroundColor: Colors.grey[900],
+            appBarTheme: AppBarTheme(
+              backgroundColor: Colors.purple.shade900,
+              foregroundColor: Colors.white,
+            ),
+            colorScheme: ColorScheme.dark(
+              primary: Colors.purple,
+              primaryContainer: Colors.purple.shade700,
+              secondary: Colors.deepPurpleAccent,
+              secondaryContainer: Colors.deepPurple.shade700,
+              onPrimary: Colors.white,
+              onSecondary: Colors.white,
+            ),
+            useMaterial3: true,
+          ),
+          themeMode: isLightMode ? ThemeMode.light : ThemeMode.dark,
+          initialRoute: initialRoute,
+          routes: {
+            '/': (context) => const WelcomeScreen(),
+            '/login': (context) => const LoginScreen(),
+            '/register': (context) => const RegisterScreen(),
+            '/home': (context) => const MainWrapper(),
+            '/sports': (context) => const MainWrapper(),
+            '/exams': (context) => const MainWrapper(),
+            'roadmaps': (context) => const MainWrapper(),
+            '/offline': (context) => const OfflineScreen(),
+          },
+        );
+      },
+    );
   }
 }

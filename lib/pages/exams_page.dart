@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notify/app_widgets/horizontal_card_view_exams.dart';
 import 'package:notify/app_widgets/side_nav_bar_widget.dart';
-import 'package:notify/app_widgets/vertical_card_view.dart';
 
 class ExamsPage extends StatefulWidget {
   const ExamsPage({super.key});
@@ -15,17 +14,27 @@ class _ExamsPageState extends State<ExamsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.purple,
-        title: Text('Grow with Us'),
+        title: Text('Exam Notifications'),
         centerTitle: true,
       ),
       body: Column(
         children: [
-          const HorizontalCardViewExams(),
-          const SizedBox(
-            height: 20,
+          const SizedBox(height: 10),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: EdgeInsets.only(left: 25),
+              child: Text(
+                "Recently Released!",
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
           ),
-          const VerticalCardView(),
+          const HorizontalCardViewExams(),
+          const SizedBox(height: 20),
         ],
       ),
       drawer: const SideNavDrawerView(),

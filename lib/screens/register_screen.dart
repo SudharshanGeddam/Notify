@@ -42,6 +42,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     if (result != null && result["success"]) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Resgistration Successful!"),
@@ -56,6 +57,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
         SnackBar(content: Text(errorMessage)),
       );
     }
+  }
+
+  @override
+  void dispose() {
+    fullNameController.dispose();
+    dobController.dispose();
+    phoneNoController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
   }
 
   @override

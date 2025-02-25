@@ -9,7 +9,6 @@ class NotificationPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Notifications'),
         centerTitle: true,
-        backgroundColor: Colors.purple,
       ),
     );
   }

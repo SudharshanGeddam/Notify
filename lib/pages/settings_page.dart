@@ -17,7 +17,6 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(
         title: Text('Settings'),
         centerTitle: true,
-        backgroundColor: Colors.purple,
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),

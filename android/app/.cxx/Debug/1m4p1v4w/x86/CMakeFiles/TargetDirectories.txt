@@ -1,0 +1,2 @@
+C:/Users/Mikey/StudioProjects/notify/android/app/.cxx/Debug/1m4p1v4w/x86/CMakeFiles/edit_cache.dir
+C:/Users/Mikey/StudioProjects/notify/android/app/.cxx/Debug/1m4p1v4w/x86/CMakeFiles/rebuild_cache.dir

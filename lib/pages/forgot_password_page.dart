@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:notify/data/api_service.dart';
 import 'package:notify/screens/login_screen.dart';
@@ -10,11 +12,49 @@ class ForgotPasswordPage extends StatefulWidget {
 }
 
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+  bool _isObscure = true;
   bool isVerified = false;
+  bool isVerifying = false;
+  int countdown = 60;
+  int resendCountdown = 120;
+  Timer? verifyTimer;
+  Timer? resendTimer;
+
   TextEditingController emailController = TextEditingController();
   TextEditingController otpController = TextEditingController();
   TextEditingController newPasswordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
+
+  void startVerifyCountdown() {
+    setState(() {
+      isVerifying = true;
+      countdown = 60;
+    });
+
+    verifyTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (countdown > 0) {
+        setState(() {
+          countdown--;
+        });
+      } else {
+        timer.cancel();
+      }
+    });
+
+    resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (resendCountdown > 0) {
+        setState(() {
+          resendCountdown--;
+        });
+      } else {
+        timer.cancel();
+        setState(() {
+          isVerifying = false;
+          resendCountdown = 120;
+        });
+      }
+    });
+  }
 
   void verifyEmail() {
     setState(() {
@@ -23,60 +63,30 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   }
 
   @override
+  void dispose() {
+    verifyTimer?.cancel();
+    resendTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Text(
-                "Please enter your email to reset password.",
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                Text(
+                  "Please enter your email to reset password.",
                 ),
-              ),
-              SizedBox(height: 16.0),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: FilledButton(
-                  onPressed: forgotPassword,
-                  child: Text("Verify"),
-                ),
-              ),
-              if (isVerified) ...[
+                const SizedBox(height: 20),
                 TextField(
-                  controller: otpController,
+                  controller: emailController,
                   decoration: InputDecoration(
-                    labelText: 'Enter OTP',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16.0),
-                TextField(
-                  controller: newPasswordController,
-                  decoration: InputDecoration(
-                    labelText: 'new password',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16.0),
-                TextField(
-                  controller: confirmPasswordController,
-                  decoration: InputDecoration(
-                    labelText: 'confirm password',
+                    labelText: 'Email',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -86,12 +96,92 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 Align(
                   alignment: Alignment.bottomRight,
                   child: FilledButton(
-                    onPressed: resetPassword,
-                    child: Text("Submit"),
+                    onPressed: isVerifying
+                        ? null
+                        : () {
+                            forgotPassword();
+                            startVerifyCountdown();
+                          },
+                    child: isVerifying
+                        ? Text("Resend OTP in $countdown sec")
+                        : Text("Verify"),
                   ),
                 ),
+                if (isVerified) ...[
+                  TextField(
+                    controller: otpController,
+                    decoration: InputDecoration(
+                      labelText: 'Enter OTP',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  TextField(
+                    controller: newPasswordController,
+                    obscureText: _isObscure,
+                    decoration: InputDecoration(
+                      fillColor: Colors.white,
+                      filled: true,
+                      labelText: "newPassword",
+                      prefixIcon: Icon(
+                        Icons.password,
+                        color: Colors.grey,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isObscure ? Icons.visibility_off : Icons.visibility,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isObscure = !_isObscure;
+                          });
+                        },
+                      ),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0)),
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  TextField(
+                    controller: confirmPasswordController,
+                    obscureText: _isObscure,
+                    decoration: InputDecoration(
+                      fillColor: Colors.white,
+                      filled: true,
+                      labelText: "confirmPassword",
+                      prefixIcon: Icon(
+                        Icons.password,
+                        color: Colors.grey,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isObscure ? Icons.visibility_off : Icons.visibility,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isObscure = !_isObscure;
+                          });
+                        },
+                      ),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0)),
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: FilledButton(
+                      onPressed: resetPassword,
+                      child: Text("Submit"),
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
@@ -113,6 +203,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Please check your email for OTP.")),
       );
+
+      setState(() {
+        isVerified = true;
+      });
     } else {
       String errorMessage =
           verify?["message"] ?? "Verification failed! Please try again.";
@@ -149,7 +243,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         );
       } else {
         String errorMessage = submit?["message"] ??
-            "Something went worng! Please try again later.";
+            "Something went wrong! Please try again later.";
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(errorMessage)),
         );

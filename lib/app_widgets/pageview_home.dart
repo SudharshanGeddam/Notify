@@ -47,7 +47,9 @@ class _PageViewJobState extends State<PageviewHome> {
           SizedBox(
             height: 200,
             child: jobList.isEmpty
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
                 : PageView.builder(
                     controller: _pageController,
                     onPageChanged: (index) {
@@ -55,7 +57,7 @@ class _PageViewJobState extends State<PageviewHome> {
                         _currentIndex = index;
                       });
                     },
-                    itemCount: jobList.length,
+                    itemCount: 10,
                     itemBuilder: (context, index) {
                       return JobCard(
                           isDarkMode: isDarkMode, job: jobList[index]);
@@ -93,45 +95,41 @@ class JobCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Flexible(
-          child: Container(
-            height: 160,
-            decoration: BoxDecoration(
-              color: isDarkMode ? Colors.grey[900] : Colors.white,
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: [
-                BoxShadow(
-                  color: isDarkMode ? Colors.white12 : Colors.black26,
-                  blurRadius: 5,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        height: 160,
+        decoration: BoxDecoration(
+          color: isDarkMode ? Colors.grey[900] : Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: isDarkMode ? Colors.white12 : Colors.black26,
+              blurRadius: 5,
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildText("Category", job.postBoard),
+              _buildText("Date Released", job.postDate),
+              _buildText("Qualification", job.qualification),
+              _buildText("Last Date", job.lastDate),
+              GestureDetector(
+                onTap: () => _openLink(context, job.link),
+                child: Text(
+                  "View More",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.blue[200] : Colors.blue,
+                  ),
                 ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildText("Category", job.postBoard),
-                  _buildText("Date Released", job.postDate),
-                  _buildText("Qualification", job.qualification),
-                  _buildText("Last Date", job.lastDate),
-                  GestureDetector(
-                    onTap: () => _openLink(context, job.link),
-                    child: Text(
-                      "View More",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.blue[200] : Colors.blue,
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
+              )
+            ],
           ),
         ),
       ),
@@ -139,42 +137,47 @@ class JobCard extends StatelessWidget {
   }
 
   Widget _buildText(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: RichText(
-        text: TextSpan(
-          style: TextStyle(
-            fontSize: 14,
-            color: isDarkMode ? Colors.white : Colors.black,
-          ),
-          children: [
-            TextSpan(
-              text: "$title: ",
-              style: const TextStyle(fontWeight: FontWeight.bold),
+    return Flexible(
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 4),
+        child: RichText(
+          text: TextSpan(
+            style: TextStyle(
+              fontSize: 14,
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
-            TextSpan(text: value),
-          ],
+            children: [
+              TextSpan(
+                text: "$title: ",
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              TextSpan(text: value),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  void _openLink(BuildContext context, String url) async {
-    try {
-      final Uri uri = Uri.parse(url);
-
-      // Debugging: Print the URL
-      print("Opening URL: $url");
-
-      if (!await canLaunchUrl(uri)) {
-        throw "Cannot launch URL: $url";
-      }
-
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } catch (e) {
-      print("Error: $e");
+  void _openLink(BuildContext context, String? url) async {
+    if (url == null || url.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Could not open link: $e")),
+        const SnackBar(content: Text("Invalid URL: URL is empty")),
+      );
+      return;
+    }
+
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+      url = "https://$url";
+    }
+
+    final Uri uri = Uri.parse(url);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Could not open link")),
       );
     }
   }

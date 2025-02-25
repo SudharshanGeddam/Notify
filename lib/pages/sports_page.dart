@@ -16,7 +16,6 @@ class _SportsPageState extends State<SportsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.purple,
         title: Text('Sports'),
         centerTitle: true,
       ),

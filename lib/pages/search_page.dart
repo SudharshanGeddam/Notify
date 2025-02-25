@@ -40,7 +40,6 @@ class _SearchPageState extends State<SearchPage> {
       appBar: AppBar(
         title: Text('Notify'),
         centerTitle: true,
-        backgroundColor: Colors.purple,
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),

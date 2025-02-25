@@ -84,6 +84,68 @@ class ApiService {
     return data;
   }
 
+  static Future<String?> _getUserId() async {
+    final token = await _getToken();
+    if (token == null) {
+      return null;
+    }
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) {
+        return null;
+      }
+
+      String payload = parts[1];
+
+      switch (payload.length % 4) {
+        case 0:
+          break;
+        case 2:
+          payload += "==";
+          break;
+        case 3:
+          payload += "=";
+          break;
+        default:
+          return null;
+      }
+
+      final decoded = utf8.decode(base64Url.decode(payload));
+      final payloadMap = json.decode(decoded);
+      if (payloadMap is Map<String, dynamic> &&
+          payloadMap.containsKey("userId")) {
+        return payloadMap["userId"];
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
+  static Future<http.Response?> getProfile() async {
+    final userId = await _getUserId();
+    if (userId == null) {
+      return null;
+    }
+
+    final Uri uri =
+        Uri.parse("$baseurl/auth/profile").replace(queryParameters: {
+      'userId': userId,
+    });
+
+    try {
+      final response = await http.get(uri);
+      if (response.statusCode == 200) {
+        return response;
+      } else {
+        return response;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<List<dynamic>> fetchJobs() async {
     try {
       final token = await _getToken();
