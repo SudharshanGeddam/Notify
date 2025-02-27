@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:notify/data/exams.dart';
 import 'package:notify/data/jobs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
+  static final http.Client client = http.Client();
   static final String baseurl =
       dotenv.env['API_URI'] ?? "http://142.93.219.77:5115";
 
@@ -12,76 +14,106 @@ class ApiService {
       String phoneNo, String email, String password) async {
     final Uri url = Uri.parse("$baseurl/auth/register");
 
-    final response = await http.post(url,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "fullName": fullName,
-          "dob": dob,
-          "phoneNumber": phoneNo,
-          "email": email,
-          "password": password,
-        }));
+    try {
+      final response = await client
+          .post(
+            url,
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode({
+              "fullName": fullName,
+              "dob": dob,
+              "phoneNumber": phoneNo,
+              "email": email,
+              "password": password,
+            }),
+          )
+          .timeout(Duration(seconds: 60));
 
-    final data = jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-    if (response.statusCode == 200 && data["success"] == true) {
-      await _saveToken(data["accessToken"]);
+      if (response.statusCode == 200 && data["success"] == true) {
+        await _saveToken(data["accessToken"]);
+      }
+      return data;
+    } catch (e) {
+      return null;
     }
-    return data;
   }
 
   static Future<Map<String, dynamic>?> loginUSer(
       String email, String password) async {
     final Uri url = Uri.parse("$baseurl/auth/login");
 
-    final response = await http.post(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "email": email,
-        "password": password,
-      }),
-    );
+    try {
+      final response = await client
+          .post(
+            url,
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode({
+              "email": email,
+              "password": password,
+            }),
+          )
+          .timeout(Duration(seconds: 60));
 
-    final data = jsonDecode(response.body);
-    if (response.statusCode == 200) {
-      await _saveToken(data["accessToken"]);
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        await _saveToken(data["accessToken"]);
+      }
+      return data;
+    } catch (e) {
+      return null;
     }
-    return data;
   }
 
   static Future<Map<String, dynamic>?> forgotPassword(String email) async {
     final Uri url = Uri.parse("$baseurl/auth/forgot-password");
 
-    final response = await http.post(url,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "email": email,
-        }));
+    try {
+      final response = await client
+          .post(
+            url,
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode({
+              "email": email,
+            }),
+          )
+          .timeout(Duration(seconds: 60));
 
-    final data = jsonDecode(response.body);
-    return data;
+      final data = jsonDecode(response.body);
+      return data;
+    } catch (e) {
+      return null;
+    }
   }
 
   static Future<Map<String, dynamic>?> verifyPassword(String email, String code,
       String newPassword, String confirmPassword) async {
     final Uri url = Uri.parse("$baseurl/auth/reset-password");
 
-    final response = await http.patch(url,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "email": email,
-          "code": code,
-          "newPassword": newPassword,
-          "passwordConfirm": confirmPassword,
-        }));
+    try {
+      final response = await client
+          .patch(
+            url,
+            headers: {"Content-Type": "application/json"},
+            body: jsonEncode({
+              "email": email,
+              "code": code,
+              "newPassword": newPassword,
+              "passwordConfirm": confirmPassword,
+            }),
+          )
+          .timeout(Duration(seconds: 60));
 
-    final data = jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-    if (response.statusCode == 200 && data["success"] == true) {
-      await _saveToken(data["accessToken"]);
+      if (response.statusCode == 200 && data["success"] == true) {
+        await _saveToken(data["accessToken"]);
+      }
+      return data;
+    } catch (e) {
+      return null;
     }
-    return data;
   }
 
   static Future<String?> _getUserId() async {
@@ -135,7 +167,7 @@ class ApiService {
     });
 
     try {
-      final response = await http.get(uri);
+      final response = await client.get(uri);
       if (response.statusCode == 200) {
         return response;
       } else {
@@ -149,12 +181,11 @@ class ApiService {
   Future<List<dynamic>> fetchJobs() async {
     try {
       final token = await _getToken();
-      final response = await http.get(
-          Uri.parse("$baseurl/freejobalert/v1/?page=1&limit=10"),
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer $token",
-          });
+      final response =
+          await client.get(Uri.parse("$baseurl/freejobalert/v1/"), headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      });
 
       if (response.statusCode == 200) {
         var jsonData = json.decode(response.body)['data'];
@@ -162,6 +193,27 @@ class ApiService {
         return jsonData.map<Job>((item) => Job.fromJson(item)).toList();
       } else {
         throw Exception("Failed to load data$response");
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<List<dynamic>> fetchExams() async {
+    try {
+      final token = await _getToken();
+      final response = await client
+          .get(Uri.parse("$baseurl/freejobalert/v1/latest-edu"), headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      });
+
+      if (response.statusCode == 200) {
+        var jsonData = json.decode(response.body)['data'];
+
+        return jsonData.map<Exams>((item) => Exams.fromJson(item)).toList();
+      } else {
+        throw Exception("Failed to load data $response");
       }
     } catch (e) {
       throw Exception(e);

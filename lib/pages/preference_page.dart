@@ -10,6 +10,8 @@ class PreferencesPage extends StatefulWidget {
 class PreferencesPageState extends State<PreferencesPage> {
   bool? isCheckedExams = false;
   bool? isCheckedSports = false;
+  bool? isCheckedTeaching = false;
+  bool? isCheckedBanking = false;
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +40,26 @@ class PreferencesPageState extends State<PreferencesPage> {
               onChanged: (bool? value) {
                 setState(() {
                   isCheckedSports = value;
+                });
+              },
+            ),
+            CheckboxListTile(
+              title: const Text('Teaching'),
+              tristate: true,
+              value: isCheckedTeaching,
+              onChanged: (bool? value) {
+                setState(() {
+                  isCheckedTeaching = value;
+                });
+              },
+            ),
+            CheckboxListTile(
+              title: const Text('Banking'),
+              tristate: true,
+              value: isCheckedBanking,
+              onChanged: (bool? value) {
+                setState(() {
+                  isCheckedBanking = value;
                 });
               },
             ),

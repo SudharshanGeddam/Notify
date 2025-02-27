@@ -116,10 +116,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           Padding(
                             padding: EdgeInsets.only(left: 25.0),
                             child: Text(
-                              "Treding on Notify...🔥 ",
+                              "Trending on Notify!🔥 ",
                               textAlign: TextAlign.left,
                               style: const TextStyle(
                                   fontSize: 18,
+                                  fontWeight: FontWeight.w600,
                                   fontStyle: FontStyle.italic,
                                   fontFamily: 'assets/fonts/Inter'),
                             ),

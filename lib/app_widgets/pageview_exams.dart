@@ -1,32 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:notify/data/api_service.dart';
-import 'package:notify/data/jobs.dart';
+import 'package:notify/data/exams.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class PageviewHome extends StatefulWidget {
-  const PageviewHome({super.key});
+class PageviewExams extends StatefulWidget {
+  const PageviewExams({super.key});
 
   @override
-  State<PageviewHome> createState() => _PageViewJobState();
+  State<PageviewExams> createState() => _PageViewJobState();
 }
 
-class _PageViewJobState extends State<PageviewHome> {
+class _PageViewJobState extends State<PageviewExams> {
   final PageController _pageController = PageController(viewportFraction: 0.9);
   int _currentIndex = 0;
 
-  List<Job> jobList = [];
+  List<Exams> examsList = [];
 
   @override
   void initState() {
     super.initState();
-    _loadJobs();
+    _loadExamDetails();
   }
 
-  Future<void> _loadJobs() async {
+  Future<void> _loadExamDetails() async {
     try {
-      List<dynamic> jobs = await ApiService().fetchJobs();
+      List<dynamic> exams = await ApiService().fetchExams();
       setState(() {
-        jobList = jobs.cast<Job>();
+        examsList = exams.cast<Exams>();
       });
     } catch (e) {
       if (!mounted) return;
@@ -45,8 +45,8 @@ class _PageViewJobState extends State<PageviewHome> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-            height: 180,
-            child: jobList.isEmpty
+            height: 150,
+            child: examsList.isEmpty
                 ? const Center(
                     child: CircularProgressIndicator(),
                   )
@@ -59,8 +59,12 @@ class _PageViewJobState extends State<PageviewHome> {
                     },
                     itemCount: 10,
                     itemBuilder: (context, index) {
-                      return JobCard(
-                          isDarkMode: isDarkMode, job: jobList[index]);
+                      return SizedBox(
+                        height: 160,
+                        child: ExamCard(
+                            isDarkMode: isDarkMode,
+                            examDetail: examsList[index]),
+                      );
                     },
                   ),
           ),
@@ -88,17 +92,26 @@ class _PageViewJobState extends State<PageviewHome> {
   }
 }
 
-class JobCard extends StatelessWidget {
+class ExamCard extends StatelessWidget {
   final bool isDarkMode;
-  final Job job;
-  const JobCard({super.key, required this.isDarkMode, required this.job});
+  final Exams examDetail;
+
+  const ExamCard({
+    super.key,
+    required this.isDarkMode,
+    required this.examDetail,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
-        height: 160,
+        width: double.infinity,
+        constraints: const BoxConstraints(
+          minHeight: 100,
+          maxHeight: 160,
+        ),
         decoration: BoxDecoration(
           color: isDarkMode ? Colors.grey[900] : Colors.white,
           borderRadius: BorderRadius.circular(10),
@@ -112,14 +125,14 @@ class JobCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildText("Category", job.postBoard),
-              _buildText("Date Released", job.postDate),
-              _buildText("Qualification", job.qualification),
-              _buildText("Last Date", job.lastDate),
+              _buildText("Sector", examDetail.sector),
+              _buildText("Date Released", examDetail.postDate),
+              _buildText("Status", examDetail.updateInformation),
               GestureDetector(
-                onTap: () => _openLink(context, job.officialWebsite),
+                onTap: () => _openLink(context, examDetail.detailLink),
                 child: Text(
                   "View More",
                   style: TextStyle(
@@ -128,7 +141,7 @@ class JobCard extends StatelessWidget {
                     color: isDarkMode ? Colors.blue[200] : Colors.blue,
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -137,22 +150,30 @@ class JobCard extends StatelessWidget {
   }
 
   Widget _buildText(String title, String value) {
-    return Flexible(
+    return SizedBox(
+      width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 4),
-        child: RichText(
-          text: TextSpan(
-            style: TextStyle(
-              fontSize: 14,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-            children: [
-              TextSpan(
-                text: "$title: ",
-                style: const TextStyle(fontWeight: FontWeight.bold),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: RichText(
+            text: TextSpan(
+              style: TextStyle(
+                fontSize: 14,
+                color: isDarkMode ? Colors.white : Colors.black,
               ),
-              TextSpan(text: value),
-            ],
+              children: [
+                TextSpan(
+                  text: "$title: ",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    height: 1.5,
+                  ),
+                ),
+                TextSpan(text: value),
+              ],
+            ),
+            overflow: TextOverflow.clip,
           ),
         ),
       ),

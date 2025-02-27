@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:notify/app_widgets/horizontal_card_view_sports.dart';
 import 'package:notify/app_widgets/side_nav_bar_widget.dart';
-import 'package:notify/app_widgets/vertical_card_view.dart';
 
 class SportsPage extends StatefulWidget {
   const SportsPage({super.key});
@@ -21,11 +19,9 @@ class _SportsPageState extends State<SportsPage> {
       ),
       body: Column(
         children: [
-          const HorizontalCardViewSports(),
           const SizedBox(
             height: 25,
           ),
-          const VerticalCardView(),
         ],
       ),
       drawer: const SideNavDrawerView(),

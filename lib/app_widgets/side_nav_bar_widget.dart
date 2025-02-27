@@ -58,7 +58,7 @@ class SideNavDrawerView extends StatelessWidget {
               showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
-                        title: Text('Log Out'),
+                        title: Text('Logout'),
                         content: Text('Are you sure you want to log out?'),
                         actions: [
                           TextButton(
@@ -70,7 +70,7 @@ class SideNavDrawerView extends StatelessWidget {
                               Navigator.pop(context);
                               _logout(context);
                             },
-                            child: Text('Log Out'),
+                            child: Text('Logout'),
                           )
                         ],
                       ));
