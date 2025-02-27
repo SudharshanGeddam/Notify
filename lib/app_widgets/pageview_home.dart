@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:notify/data/api_service.dart';
-import 'package:notify/data/jobs.dart';
+import 'package:Notify/data/api_service.dart';
+import 'package:Notify/data/jobs.dart';
+import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PageviewHome extends StatefulWidget {
@@ -104,33 +105,46 @@ class JobCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
-              color: isDarkMode ? Colors.white12 : Colors.black26,
+              color: isDarkMode ? Colors.white : Colors.black,
               blurRadius: 5,
             ),
           ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildText("Category", job.postBoard),
-              _buildText("Date Released", job.postDate),
-              _buildText("Qualification", job.qualification),
-              _buildText("Last Date", job.lastDate),
-              GestureDetector(
-                onTap: () => _openLink(context, job.officialWebsite),
-                child: Text(
-                  "View More",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.blue[200] : Colors.blue,
-                  ),
-                ),
-              )
-            ],
-          ),
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildText("Category", job.postBoard),
+                  _buildText("Date Released", job.postDate),
+                  _buildText("Qualification", job.qualification),
+                  _buildText("Last Date", job.lastDate),
+                  GestureDetector(
+                    onTap: () => _openLink(context, job.officialWebsite),
+                    child: Text(
+                      "View More",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.blue[200] : Colors.blue,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Positioned(
+              right: 10,
+              child: SizedBox(
+                height: 50,
+                width: 50,
+                child: Lottie.asset('assets/lotties/New.json',
+                    repeat: true, animate: true),
+              ),
+            ),
+          ],
         ),
       ),
     );

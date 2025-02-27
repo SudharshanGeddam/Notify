@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:notify/data/exams.dart';
-import 'package:notify/data/jobs.dart';
+import 'package:Notify/data/exams.dart';
+import 'package:Notify/data/jobs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {

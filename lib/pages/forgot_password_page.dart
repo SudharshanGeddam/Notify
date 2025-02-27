@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:notify/data/api_service.dart';
-import 'package:notify/screens/login_screen.dart';
+import 'package:Notify/data/api_service.dart';
+import 'package:Notify/screens/login_screen.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});

@@ -1,6 +1,8 @@
+import 'package:Notify/data/notifiers.dart';
 import 'package:flutter/material.dart';
-import 'package:notify/data/api_service.dart';
-import 'package:notify/data/exams.dart';
+import 'package:Notify/data/api_service.dart';
+import 'package:Notify/data/exams.dart';
+import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PageviewExams extends StatefulWidget {
@@ -104,49 +106,70 @@ class ExamCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        width: double.infinity,
-        constraints: const BoxConstraints(
-          minHeight: 100,
-          maxHeight: 160,
-        ),
-        decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[900] : Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: isDarkMode ? Colors.white12 : Colors.black26,
-              blurRadius: 5,
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildText("Sector", examDetail.sector),
-              _buildText("Date Released", examDetail.postDate),
-              _buildText("Status", examDetail.updateInformation),
-              GestureDetector(
-                onTap: () => _openLink(context, examDetail.detailLink),
-                child: Text(
-                  "View More",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.blue[200] : Colors.blue,
-                  ),
-                ),
+    return ValueListenableBuilder(
+        valueListenable: isLightModeNotifier,
+        builder: (context, bool isLightMode, child) {
+          final borderColor = isLightMode ? Colors.black : Colors.white;
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Container(
+              width: double.infinity,
+              constraints: const BoxConstraints(
+                minHeight: 100,
+                maxHeight: 160,
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+              decoration: BoxDecoration(
+                color: isDarkMode ? Colors.grey[900] : Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: borderColor,
+                    blurRadius: 5,
+                  ),
+                ],
+              ),
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildText("Sector", examDetail.sector),
+                        _buildText("Date Released", examDetail.postDate),
+                        _buildText("Status", examDetail.updateInformation),
+                        GestureDetector(
+                          onTap: () =>
+                              _openLink(context, examDetail.detailLink),
+                          child: Text(
+                            "View More",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color:
+                                  isDarkMode ? Colors.blue[200] : Colors.blue,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    right: 10,
+                    child: SizedBox(
+                      height: 50,
+                      width: 50,
+                      child: Lottie.asset('assets/lotties/New.json',
+                          repeat: true, animate: true),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 
   Widget _buildText(String title, String value) {

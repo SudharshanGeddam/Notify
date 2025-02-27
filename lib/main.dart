@@ -1,12 +1,12 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:notify/data/notifiers.dart';
-import 'package:notify/screens/login_screen.dart';
-import 'package:notify/screens/main_wrapper.dart';
-import 'package:notify/screens/offline_screen.dart';
-import 'package:notify/screens/register_screen.dart';
-import 'package:notify/screens/welcome_screen.dart';
+import 'package:Notify/data/notifiers.dart';
+import 'package:Notify/screens/login_screen.dart';
+import 'package:Notify/screens/main_wrapper.dart';
+import 'package:Notify/screens/offline_screen.dart';
+import 'package:Notify/screens/register_screen.dart';
+import 'package:Notify/screens/welcome_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {

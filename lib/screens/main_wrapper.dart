@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:notify/pages/notification_page.dart';
-import 'package:notify/pages/search_page.dart';
-import 'package:notify/screens/home_screen.dart';
+import 'package:Notify/pages/notification_page.dart';
+import 'package:Notify/pages/search_page.dart';
+import 'package:Notify/screens/home_screen.dart';
 
 class MainWrapper extends StatefulWidget {
   const MainWrapper({super.key});

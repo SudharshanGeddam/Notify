@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:notify/app_widgets/side_nav_bar_widget.dart';
+import 'package:Notify/app_widgets/side_nav_bar_widget.dart';
 
 class SportsPage extends StatefulWidget {
   const SportsPage({super.key});

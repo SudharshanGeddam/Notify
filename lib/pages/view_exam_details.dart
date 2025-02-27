@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:notify/data/exams.dart';
-import 'package:notify/data/notifiers.dart';
+import 'package:Notify/data/exams.dart';
+import 'package:Notify/data/notifiers.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ViewExamDetails extends StatelessWidget {
@@ -10,9 +10,12 @@ class ViewExamDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Exam Details"),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -27,16 +30,10 @@ class ViewExamDetails extends StatelessWidget {
                   _buildDetailRow(context, "Posted On", examDetail.postDate,
                       Icons.calendar_month),
                   const SizedBox(height: 10),
-                  _buildDetailRow(
-                    context,
-                    "Important Dates",
-                    examDetail.importantDates.isNotEmpty
-                        ? examDetail.importantDates.join(", ")
-                        : "Not Available",
-                    Icons.event_outlined,
-                  ),
+                  _buildContext(context, examDetail.importantDates),
                 ],
               ),
+              context: context,
             ),
             _buildCard(
               child: Column(
@@ -61,21 +58,29 @@ class ViewExamDetails extends StatelessWidget {
                   ),
                 ],
               ),
+              context: context,
             ),
             _buildCard(
+              context: context,
               child: _buildClickableLinks(context, examDetail.importantLinks),
             ),
             const SizedBox(height: 20),
             Center(
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.purpleAccent,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 32),
+              child: SizedBox(
+                width: 300,
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        isDarkMode ? Colors.deepPurpleAccent : Colors.purple,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12, horizontal: 32),
+                  ),
+                  child: const Text("🔔 Notify Me",
+                      style: TextStyle(fontSize: 16, color: Colors.white)),
                 ),
-                child: const Text("🔔 Notify Me",
-                    style: TextStyle(fontSize: 16, color: Colors.white)),
               ),
             ),
           ],
@@ -94,7 +99,7 @@ class ViewExamDetails extends StatelessWidget {
         valueListenable: isLightModeNotifier,
         builder: (context, bool isLightMode, child) {
           final textColor = isLightMode ? Colors.black : Colors.white;
-          final iconColor = isLightMode ? Colors.purple : Colors.white;
+          final iconColor = isLightMode ? Colors.purple : Colors.blue;
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -123,6 +128,42 @@ class ViewExamDetails extends StatelessWidget {
             ],
           );
         });
+  }
+
+  Widget _buildContext(BuildContext context, List<String> dates) {
+    if (dates.isEmpty) {
+      return const Text("No Dates Mentioned");
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Important Dates:",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        Column(
+          children: dates.map((date) {
+            return Padding(
+              padding: EdgeInsets.only(bottom: 4.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("• ", style: TextStyle(fontSize: 16)),
+                  Expanded(
+                      child: Text(
+                    date,
+                    style: TextStyle(fontSize: 16),
+                    softWrap: true,
+                  ))
+                ],
+              ),
+            );
+          }).toList(),
+        )
+      ],
+    );
   }
 
   Widget _buildClickableLinks(BuildContext context, List<String> links) {
@@ -177,10 +218,13 @@ class ViewExamDetails extends StatelessWidget {
     }
   }
 
-  Widget _buildCard({required Widget child}) {
+  Widget _buildCard({required Widget child, required BuildContext context}) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: isDarkMode ? Colors.white : Colors.black)),
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(padding: const EdgeInsets.all(16), child: child),
     );
@@ -189,9 +233,12 @@ class ViewExamDetails extends StatelessWidget {
   Widget _buildTitleText(String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: Text(
-        title,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:notify/data/api_service.dart';
-import 'package:notify/data/exams.dart';
-import 'package:notify/pages/view_exam_details.dart';
+import 'package:Notify/data/api_service.dart';
+import 'package:Notify/data/exams.dart';
+import 'package:Notify/data/notifiers.dart';
+import 'package:Notify/pages/view_exam_details.dart';
 
 class VerticalCardViewExams extends StatefulWidget {
   const VerticalCardViewExams({super.key});
@@ -65,66 +66,85 @@ class VerticalExamCardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: isDarkMode ? Colors.grey[900] : Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      elevation: 3,
-      margin: const EdgeInsets.all(12),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.catching_pokemon,
-                    size: 16,
-                    color: Colors.black,
-                  ),
-                  const SizedBox(width: 10),
-                  _buildText("Sector", examDetail.sector),
-                ],
+    return ValueListenableBuilder(
+        valueListenable: isLightModeNotifier,
+        builder: (context, bool isLightMode, child) {
+          final iconColor = isLightMode ? Colors.black : Colors.blue;
+          final buttonColor = isLightMode ? Colors.purple : Colors.blue;
+          final borderColor = isLightMode ? Colors.black : Colors.white;
+
+          return Card(
+            color: isDarkMode ? Colors.grey[900] : Colors.white,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+                side: BorderSide(color: borderColor)),
+            elevation: 3,
+            margin: const EdgeInsets.all(12),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.catching_pokemon,
+                          size: 16,
+                          color: iconColor,
+                        ),
+                        const SizedBox(width: 10),
+                        _buildText("Sector", examDetail.sector),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_month,
+                          size: 16,
+                          color: iconColor,
+                        ),
+                        const SizedBox(width: 10),
+                        _buildText("PostedOn", examDetail.postDate)
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.list,
+                          size: 16,
+                          color: iconColor,
+                        ),
+                        const SizedBox(width: 10),
+                        _buildText("Status", examDetail.updateInformation),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: buttonColor,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6)),
+                      ),
+                      onPressed: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return ViewExamDetails(examDetail: examDetail);
+                        }));
+                      },
+                      child: Text(
+                        "View Details",
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              Row(
-                children: [
-                  Icon(
-                    Icons.calendar_month,
-                    size: 16,
-                    color: Colors.black,
-                  ),
-                  const SizedBox(width: 10),
-                  _buildText("PostedOn", examDetail.postDate)
-                ],
-              ),
-              Row(
-                children: [
-                  Icon(
-                    Icons.list,
-                    size: 16,
-                    color: Colors.black,
-                  ),
-                  const SizedBox(width: 10),
-                  _buildText("Status", examDetail.updateInformation),
-                ],
-              ),
-              const SizedBox(height: 10),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return ViewExamDetails(examDetail: examDetail);
-                  }));
-                },
-                child: Text("View Details"),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          );
+        });
   }
 
   Widget _buildText(String title, String value) {
@@ -152,46 +172,4 @@ class VerticalExamCardView extends StatelessWidget {
       ),
     );
   }
-
-  // void _showDialogue(BuildContext context) {
-  //   showDialog(
-  //       context: context,
-  //       builder: (BuildContext context) {
-  //         return Dialog(
-  //           shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.circular(10),
-  //           ),
-  //           child: Padding(
-  //               padding: EdgeInsets.all(10),
-  //               child: Column(
-  //                 mainAxisSize: MainAxisSize.min,
-  //                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                 children: [
-  //                   _buildText("Sector", examDetail.sector),
-  //                   _buildText("Posted On", examDetail.postDate),
-  //                   _buildText("Status", examDetail.updateInformation),
-  //                   _buildText(
-  //                       "Important Dates",
-  //                       examDetail.importantDates.isNotEmpty == true
-  //                           ? examDetail.importantDates.join(", ")
-  //                           : "Not Available"),
-  //                   _buildText(
-  //                       "ImportantDates", examDetail.importantDates.join(",")),
-  //                   _buildText("AgeLimit", examDetail.ageLimit.join(",")),
-  //                   _buildText(
-  //                       "Qualification", examDetail.qualification.join(",")),
-  //                   _buildText(
-  //                       "ImportantLinks", examDetail.importantLinks.join(",")),
-  //                   const SizedBox(height: 10),
-  //                   Align(
-  //                     alignment: Alignment.centerRight,
-  //                     child: ElevatedButton(
-  //                         onPressed: () => Navigator.of(context).pop(),
-  //                         child: Text("Close")),
-  //                   )
-  //                 ],
-  //               )),
-  //         );
-  //       });
-  // }
 }

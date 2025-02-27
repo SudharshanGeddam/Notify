@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notify/data/notifiers.dart';
+import 'package:Notify/data/notifiers.dart';
 
 class ThemeToggleIcon extends StatelessWidget {
   const ThemeToggleIcon({super.key});

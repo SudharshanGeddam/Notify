@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:notify/data/api_service.dart';
+import 'package:Notify/data/api_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

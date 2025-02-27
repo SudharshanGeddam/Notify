@@ -2,14 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:notify/app_widgets/pageview_home.dart';
-import 'package:notify/app_widgets/side_nav_bar_widget.dart';
-import 'package:notify/data/api_service.dart';
-import 'package:notify/data/notifiers.dart';
-import 'package:notify/data/theme_toggle_icon.dart';
-import 'package:notify/pages/exams_page.dart';
-import 'package:notify/pages/roadmaps_page.dart';
-import 'package:notify/pages/sports_page.dart';
+import 'package:Notify/app_widgets/pageview_home.dart';
+import 'package:Notify/app_widgets/side_nav_bar_widget.dart';
+import 'package:Notify/data/api_service.dart';
+import 'package:Notify/data/notifiers.dart';
+import 'package:Notify/data/theme_toggle_icon.dart';
+import 'package:Notify/pages/exams_page.dart';
+import 'package:Notify/pages/roadmaps_page.dart';
+import 'package:Notify/pages/sports_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -159,8 +159,7 @@ class OpenViewState extends State<OpenViews> {
         builder: (context, bool isLightMode, child) {
           final buttonBackgroundColor =
               isLightMode ? Colors.white : Colors.grey[800];
-          final buttonSideColor =
-              isLightMode ? Colors.black : (Colors.grey[800] ?? Colors.grey);
+          final buttonSideColor = isLightMode ? Colors.black : Colors.white;
           final textColor = isLightMode ? Colors.purple : Colors.white;
           final arrowColor = isLightMode ? Colors.purple : Colors.white;
 

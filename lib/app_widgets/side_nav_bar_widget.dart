@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:notify/pages/profile_page.dart';
-import 'package:notify/pages/settings_page.dart';
-import 'package:notify/screens/welcome_screen.dart';
+import 'package:Notify/pages/profile_page.dart';
+import 'package:Notify/pages/settings_page.dart';
+import 'package:Notify/screens/welcome_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SideNavDrawerView extends StatelessWidget {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:notify/app_widgets/pageview_exams.dart';
-import 'package:notify/app_widgets/side_nav_bar_widget.dart';
-import 'package:notify/app_widgets/vertical_card_view_exams.dart';
+import 'package:Notify/app_widgets/pageview_exams.dart';
+import 'package:Notify/app_widgets/side_nav_bar_widget.dart';
+import 'package:Notify/app_widgets/vertical_card_view_exams.dart';
 
 class ExamsPage extends StatefulWidget {
   const ExamsPage({super.key});

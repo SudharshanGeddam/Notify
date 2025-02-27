@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notify/pages/preference_page.dart';
+import 'package:Notify/pages/preference_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});

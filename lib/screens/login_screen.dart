@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:notify/data/api_service.dart';
-import 'package:notify/pages/forgot_password_page.dart';
+import 'package:Notify/data/api_service.dart';
+import 'package:Notify/pages/forgot_password_page.dart';
 
-import 'package:notify/screens/register_screen.dart';
+import 'package:Notify/screens/register_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
