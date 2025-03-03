@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:Notify/data/api_service.dart';
+import 'dart:convert';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -12,7 +13,6 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   File? _image;
-
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController dobController = TextEditingController();
@@ -25,20 +25,21 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _loadUserData() async {
-    Map<String, dynamic> userData =
-        (await ApiService.getProfile()) as Map<String, dynamic>;
-    setState(() {
-      nameController.text = userData['fullName'] ?? '';
-      emailController.text = userData['email'] ?? '';
-      dobController.text = userData['dob'];
-      phoneController.text = userData['phoneNo'] ?? '';
-    });
+    final response = await ApiService.getProfile();
+    if (response != null && response.statusCode == 200) {
+      Map<String, dynamic> userData = json.decode(response.body);
+      setState(() {
+        nameController.text = userData['fullName'] ?? '';
+        emailController.text = userData['email'] ?? '';
+        dobController.text = userData['dob'] ?? '';
+        phoneController.text = userData['phoneNo'] ?? '';
+      });
+    }
   }
 
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: source);
-
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
@@ -56,7 +57,6 @@ class _ProfilePageState extends State<ProfilePage> {
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             Center(
               child: GestureDetector(
@@ -101,55 +101,31 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 20.0,
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: TextField(
-                decoration: InputDecoration(
-                    labelText: 'Name',
-                    prefixIcon: Icon(Icons.person, color: Colors.grey),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16.0),
-                    )),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: TextField(
-                decoration: InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: Icon(Icons.email, color: Colors.grey),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16.0),
-                    )),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: TextField(
-                decoration: InputDecoration(
-                    labelText: 'DOB',
-                    prefixIcon: Icon(Icons.calendar_month, color: Colors.grey),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16.0),
-                    )),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: TextField(
-                decoration: InputDecoration(
-                    labelText: 'Phone Number',
-                    prefixIcon: Icon(Icons.phone, color: Colors.grey),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16.0),
-                    )),
-              ),
-            ),
+            SizedBox(height: 20.0),
+            _buildTextField(nameController, 'Name', Icons.person),
+            _buildTextField(emailController, 'Email', Icons.email),
+            _buildTextField(dobController, 'DOB', Icons.calendar_month),
+            _buildTextField(phoneController, 'Phone Number', Icons.phone),
+            SizedBox(height: 20.0),
             ElevatedButton(onPressed: () {}, child: Text("Save"))
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+      TextEditingController controller, String label, IconData icon) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: Icon(icon, color: Colors.grey),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
         ),
       ),
     );
