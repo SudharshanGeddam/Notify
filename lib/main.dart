@@ -1,14 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:notify/pages/profile_page.dart';
 import 'package:notify/pages/settings_page.dart';
-import 'package:notify/screens/exams_home.dart';
 import 'package:notify/screens/home_page.dart';
 import 'package:notify/screens/roadmaps.dart';
 import 'package:notify/screens/sports_home.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  // Initialize any necessary services here, such as Firebase or Hive
+  await dotenv.load(fileName: ".env");
+
   runApp(const MyApp());
 }
+
+/*
+
+// Example of a function that could be used to check login state
+Future<bool> getLoginState() async {}
+
+*/
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -20,9 +31,14 @@ class MyApp extends StatelessWidget {
       title: 'Notify',
       theme: ThemeData(
         // This is the theme of your application.
+        brightness: Brightness.light,
+        primarySwatch: Colors.blue,
+        primaryColor: const Color.fromRGBO(56, 182, 255, 1),
+        scaffoldBackgroundColor: Colors.grey[100],
         appBarTheme: const AppBarTheme(
           centerTitle: true,
           backgroundColor: Color.fromRGBO(56, 182, 255, 1),
+          foregroundColor: Colors.white,
           titleTextStyle: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -43,10 +59,14 @@ class MyApp extends StatelessWidget {
           titleSmall: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
         ),
       ),
+      /*
+      // Uncomment the following lines to enable dark mode
+      darkTheme: ThemeData(),
+      */
       initialRoute: '/',
       routes: {
         '/': (context) => const HomePage(),
-        '/exams': (context) => const ExamsHome(),
+       // '/exams': (context) => const ExamsHome(),
         '/sports': (context) => const SportsHome(),
         '/roadmaps': (context) => const Roadmaps(),
         '/profile': (context) => const ProfilePage(),

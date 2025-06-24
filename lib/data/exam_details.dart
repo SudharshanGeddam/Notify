@@ -1,25 +1,37 @@
-final examDetails = [
-  {
-    'id': '1',
-    'title': 'JEE Main',
-    'description':
-        'Joint Entrance Examination (JEE) Main is an entrance test for undergraduate engineering programs in India.',
-    'date': '2024-01-24',
-  },
-  {
-    'id': '2',
-    'title': 'NEET UG',
-    'description':
-        'National Eligibility cum Entrance Test (NEET) UG is an entrance test for undergraduate medical courses in India.',
-    'date': '2024-05-05',
-    'time': '02:00 PM - 05:00 PM',
-  },
-  {
-    'id': '3',
-    'title': 'GATE',
-    'description':
-        'Graduate Aptitude Test in Engineering (GATE) is an examination that tests the understanding of various undergraduate subjects in engineering and science.',
-    'date': '2024-02-03',
-    'time': '09:30 AM - 12:30 PM',
-  },
-];
+class ExamDetails {
+  late final String postDate;
+  late final String postBoard;
+  late final String postName;
+  late final String qualification;
+  late final String lasteDate;
+  late final String link;
+  late final String applyOnline;
+  late final String notificationFile;
+  late final String officialWebsite;
+
+  ExamDetails({
+    required this.postDate,
+    required this.postBoard,
+    required this.postName,
+    required this.qualification,
+    required this.lasteDate,
+    required this.link,
+    required this.applyOnline,
+    required this.notificationFile,
+    required this.officialWebsite,
+  });
+
+  factory ExamDetails.fromJson(Map<String, dynamic> json) {
+    return ExamDetails(
+      postDate: json['postDate'] ?? '',
+      postBoard: json['postBoard'] ?? '',
+      postName: json['postName'] ?? '',
+      qualification: json['qualification'] ?? '',
+      lasteDate: json['lasteDate'] ?? '',
+      link: json['link'] ?? '',
+      applyOnline: json['applyOnline'] ?? '',
+      notificationFile: json['notificationFile'] ?? '',
+      officialWebsite: json['officialWebsite'] ?? '',
+    );
+  }
+}
