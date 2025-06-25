@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ApiService {
   static final http.Client _client = http.Client();
   static final String _baseUrl =
-      dotenv.env['API_BASE_URL'] ?? 'http://172.81.133.173:3000/';
+      dotenv.env['API_BASE_URL'] ?? 'http://172.81.133.173:3000';
 
   static Future<Map<String, dynamic>?> registerUser(
     String fullName,
@@ -32,14 +32,12 @@ class ApiService {
             }),
           )
           .timeout(const Duration(seconds: 10));
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final data = jsonDecode(response.body);
       // Check if the response is successful
       if (response.statusCode == 200 && data['success'] == true) {
         await _saveToken(data['accessToken']);
-        return data;
-      } else {
-        throw Exception('Failed to register user');
       }
+      return data;
     } catch (e) {
       print('Error during registration: $e');
       return null;
@@ -58,53 +56,51 @@ class ApiService {
             body: jsonEncode({'email': email, 'password': password}),
           )
           .timeout(const Duration(seconds: 10));
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final data = jsonDecode(response.body);
       // Check if the response is successful
       if (response.statusCode == 200 && data['success'] == true) {
         await _saveToken(data['accessToken']);
-        return data;
-      } else {
-        throw Exception('Failed to login user');
       }
+      return data;
     } catch (e) {
       print('Error during login: $e');
       return null;
     }
   }
 
-  static Future<Map<String, dynamic>?> verifyPasswordReset(
-    String email,
-    String otp,
-    String newPassword,
-    String confirmPassword,
-  ) async {
-    try {
-      final response = await _client
-          .post(
-            Uri.parse('$_baseUrl/auth/reset-password'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'email': email,
-              'otp': otp,
-              'newPassword': newPassword,
-              'passwordConfirm': confirmPassword,
-            }),
-          )
-          .timeout(const Duration(seconds: 10));
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-      // Check if the response is successful
-      if (response.statusCode == 200 && data['success'] == true) {
-        await _saveToken(data['accessToken']);
-        print('Password reset successful');
-        return data;
-      } else {
-        throw Exception('Failed to verify password reset');
-      }
-    } catch (e) {
-      print('Error during password reset verification: $e');
-      return null;
-    }
-  }
+  // static Future<Map<String, dynamic>?> verifyPasswordReset(
+  //   String email,
+  //   String otp,
+  //   String newPassword,
+  //   String confirmPassword,
+  // ) async {
+  //   try {
+  //     final response = await _client
+  //         .post(
+  //           Uri.parse('$_baseUrl/auth/reset-password'),
+  //           headers: {'Content-Type': 'application/json'},
+  //           body: jsonEncode({
+  //             'email': email,
+  //             'otp': otp,
+  //             'newPassword': newPassword,
+  //             'passwordConfirm': confirmPassword,
+  //           }),
+  //         )
+  //         .timeout(const Duration(seconds: 10));
+  //     final data = jsonDecode(response.body) as Map<String, dynamic>;
+  //     // Check if the response is successful
+  //     if (response.statusCode == 200 && data['success'] == true) {
+  //       await _saveToken(data['accessToken']);
+  //       print('Password reset successful');
+  //       return data;
+  //     } else {
+  //       throw Exception('Failed to verify password reset');
+  //     }
+  //   } catch (e) {
+  //     print('Error during password reset verification: $e');
+  //     return null;
+  //   }
+  // }
 
   static Future<Map<String, dynamic>?> getUserProfile() async {
     try {
@@ -120,7 +116,7 @@ class ApiService {
               'Authorization': 'Bearer $token',
             },
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 30));
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       // Check if the response is successful
       if (response.statusCode == 200 && data['success'] == true) {
@@ -134,7 +130,7 @@ class ApiService {
     }
   }
 
-  Future<List<dynamic>?> fetchExams() async {
+  Future<List<ExamDetails>?> fetchExams() async {
     try {
       final token = await _getToken();
       if (token == null) {
@@ -148,7 +144,7 @@ class ApiService {
               'Authorization': 'Bearer $token',
             },
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 60));
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       // Check if the response is successful
       if (response.statusCode == 200 && data['success'] == true) {
@@ -163,7 +159,7 @@ class ApiService {
     }
   }
 
-  Future<List<dynamic>?> fetchLatestExams() async {
+  Future<List<LatestExamsDetails>?> fetchLatestExams() async {
     try {
       final token = await _getToken();
       if (token == null) {
@@ -177,7 +173,7 @@ class ApiService {
               'Authorization': 'Bearer $token',
             },
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 60));
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       // Check if the response is successful
       if (response.statusCode == 200 && data['success'] == true) {

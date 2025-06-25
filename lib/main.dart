@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:notify/auth/login_screen.dart';
 import 'package:notify/pages/profile_page.dart';
 import 'package:notify/pages/settings_page.dart';
+import 'package:notify/screens/exams_home.dart';
 import 'package:notify/screens/home_page.dart';
 import 'package:notify/screens/roadmaps.dart';
 import 'package:notify/screens/sports_home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,12 +17,11 @@ void main() async{
   runApp(const MyApp());
 }
 
-/*
-
-// Example of a function that could be used to check login state
-Future<bool> getLoginState() async {}
-
-*/
+// Saving login state
+Future<bool> getLoginState() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getBool('isLoggedIn') ?? false;
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -65,8 +67,10 @@ class MyApp extends StatelessWidget {
       */
       initialRoute: '/',
       routes: {
-        '/': (context) => const HomePage(),
-       // '/exams': (context) => const ExamsHome(),
+        '/': (context) => const LoginScreen(),
+        '/register': (context) => const LoginScreen(),
+        '/home': (context) => const HomePage(),
+       '/exams': (context) => const ExamsHome(),
         '/sports': (context) => const SportsHome(),
         '/roadmaps': (context) => const Roadmaps(),
         '/profile': (context) => const ProfilePage(),
