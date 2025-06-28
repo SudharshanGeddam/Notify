@@ -58,9 +58,7 @@ class _FilterListViewState extends State<FilterListView> {
                   horizontal: 25.0,
                   vertical: 15.0,
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                ),
+               
               ),
             ),
           );

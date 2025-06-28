@@ -1,119 +1,127 @@
 import 'package:flutter/material.dart';
+import 'package:notify/data/api_service.dart';
 import 'package:notify/data/exam_details.dart';
-import 'package:notify/data/latest_exams_details.dart';
 import 'package:notify/screens/view_details_screen.dart';
 
-class ExamsCardVertical extends StatelessWidget {
-  const ExamsCardVertical({
-    super.key,
-    required this.examDetails,
-    required this.latestExamsDetails,
-  });
+class VerticalCardViewExams extends StatefulWidget {
+  const VerticalCardViewExams({super.key});
 
-  final ExamDetails examDetails;
-  final LatestExamsDetails latestExamsDetails;
+  @override
+  State<VerticalCardViewExams> createState() => _VerticalCardViewExamsState();
+}
+
+class _VerticalCardViewExamsState extends State<VerticalCardViewExams> {
+  List<ExamDetails> examsList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadExamDetails();
+  }
+
+  Future<void> _loadExamDetails() async {
+    try {
+      List<ExamDetails>? exams = await ApiService().fetchExams().timeout(Duration(seconds: 60));
+      setState(() {
+        examsList = (exams ?? []).cast<ExamDetails>();
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Something went wrong! Please try again later.")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(12.0),
-      color: Color.fromRGBO(229, 244, 255, 1),
-      elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-
-        side: BorderSide(
-          color: Theme.of(context).colorScheme.primary,
-          width: 2.0,
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.catching_pokemon,
-                size: 16,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(width: 5),
-              _buildText(context, "Post Name:", examDetails.postName),
-            ],
-          ),
-
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Icon(
-                Icons.calendar_month,
-                size: 16,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(width: 5),
-              _buildText(context, "PostedOn:", examDetails.postDate),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Icon(
-                Icons.list,
-                size: 16,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(width: 5),
-              _buildText(context, "Apply Online:", examDetails.applyOnline),
-            ],
-          ),
-          const SizedBox(height: 10),
-          FilledButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return ViewDetailsScreen(
-                      examDetails: examDetails,
-                      latestExamsDetails: latestExamsDetails,
-                    );
-                  },
-                ),
-              );
-            },
-            child: Text("View Details", textAlign: TextAlign.center),
-          ),
-        ],
-      ),
+    return SafeArea(
+      child: examsList.isEmpty
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: examsList.length,
+              itemBuilder: (context, index) {
+                return VerticalExamCardView(examDetail: examsList[index]);
+              },
+            ),
     );
   }
 }
 
-Widget _buildText(BuildContext context, String title, String value) {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 4),
-    child: SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: RichText(
-        text: TextSpan(
-          style: Theme.of(context).textTheme.titleMedium,
+class VerticalExamCardView extends StatelessWidget {
+  final ExamDetails examDetail;
+
+  const VerticalExamCardView({super.key, required this.examDetail});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: const BorderSide(color: Colors.grey),
+      ),
+      elevation: 3,
+      margin: const EdgeInsets.all(12),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextSpan(
-              text: title,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            TextSpan(
-              text: ' $value',
-              style: Theme.of(context).textTheme.titleSmall,
+            _buildRow(Icons.catching_pokemon, "Sector", examDetail.sector),
+            _buildRow(Icons.calendar_month, "Posted On", examDetail.postDate),
+            _buildRow(Icons.list, "Status", examDetail.updateInfo),
+            const SizedBox(height: 10),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color.fromRGBO(56, 182, 255, 1),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ViewDetailsScreen(examDetail: examDetail,),
+                  ),
+                );
+              },
+              child: const Text("View Details", textAlign: TextAlign.center),
             ),
           ],
         ),
-        overflow: TextOverflow.clip,
       ),
-    ),
-  );
+    );
+  }
+
+  Widget _buildRow(IconData icon, String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: const Color.fromRGBO(56, 182, 255, 1)),
+          const SizedBox(width: 10),
+          Expanded(child: _buildText(title, value)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildText(String title, String value) {
+    return RichText(
+      text: TextSpan(
+        style: const TextStyle(fontSize: 14, color: Colors.black),
+        children: [
+          TextSpan(
+            text: "$title: ",
+            style: const TextStyle(fontWeight: FontWeight.bold, height: 1.5),
+          ),
+          TextSpan(text: value),
+        ],
+      ),
+    );
+  }
 }
