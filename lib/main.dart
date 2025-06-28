@@ -7,14 +7,23 @@ import 'package:notify/screens/exams_home.dart';
 import 'package:notify/screens/home_page.dart';
 import 'package:notify/screens/roadmaps.dart';
 import 'package:notify/screens/sports_home.dart';
+import 'package:notify/theme/app_themes.dart';
+import 'package:notify/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Initialize any necessary services here, such as Firebase or Hive
   await dotenv.load(fileName: ".env");
+  final isLoggedIn = await getLoginState();
 
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      child: MyApp(isLoggedIn: isLoggedIn),
+    ),
+  );
 }
 
 // Saving login state
@@ -24,53 +33,26 @@ Future<bool> getLoginState() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+
+  const MyApp({super.key, required this.isLoggedIn});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final themProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
       title: 'Notify',
-      theme: ThemeData(
-        // This is the theme of your application.
-        brightness: Brightness.light,
-        primarySwatch: Colors.blue,
-        primaryColor: const Color.fromRGBO(56, 182, 255, 1),
-        scaffoldBackgroundColor: Colors.grey[100],
-        appBarTheme: const AppBarTheme(
-          centerTitle: true,
-          backgroundColor: Color.fromRGBO(56, 182, 255, 1),
-          foregroundColor: Colors.white,
-          titleTextStyle: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Color.fromRGBO(56, 182, 255, 1),
-        ),
-        inputDecorationTheme: const InputDecorationTheme(
-          hintStyle: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
-        ),
-        // Use the Poppins font family
-        useMaterial3: true,
-        fontFamily: 'Poppins',
-        textTheme: const TextTheme(
-          titleMedium: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-          titleSmall: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-        ),
-      ),
-      /*
-      // Uncomment the following lines to enable dark mode
-      darkTheme: ThemeData(),
-      */
-      initialRoute: '/',
+      debugShowCheckedModeBanner: false,
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: themProvider.isDarkTheme ? ThemeMode.dark : ThemeMode.light,
+      home: isLoggedIn ? const HomePage() : const LoginScreen(),
       routes: {
-        '/': (context) => const LoginScreen(),
+        '/login': (context) => const LoginScreen(),
         '/register': (context) => const LoginScreen(),
         '/home': (context) => const HomePage(),
-       '/exams': (context) => const ExamsHome(),
+        '/exams': (context) => const ExamsHome(),
         '/sports': (context) => const SportsHome(),
         '/roadmaps': (context) => const Roadmaps(),
         '/profile': (context) => const ProfilePage(),

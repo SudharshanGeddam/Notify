@@ -4,6 +4,7 @@ import 'package:notify/app_widgets/filter_list_view.dart';
 import 'package:notify/app_widgets/latest_exams_page_view.dart';
 import 'package:notify/data/api_service.dart';
 import 'package:notify/data/exam_details.dart';
+
 import 'package:notify/data/filters_data.dart';
 import 'package:notify/data/latest_exams_details.dart';
 
@@ -17,7 +18,7 @@ class ExamsHome extends StatefulWidget {
 class _ExamsHomeState extends State<ExamsHome> {
   int currentPage = 0;
   List<LatestExamsDetails> latestExamDetailsList = [];
-  List<ExamDetails> examDetailsList = [];
+  List<JobDetails> jobDetailsList = [];
   bool isLoading = true;
 
   @override
@@ -26,14 +27,15 @@ class _ExamsHomeState extends State<ExamsHome> {
     _loadExamDetails();
   }
 
+  // Loading exams and jobs details.
   Future<void> _loadExamDetails() async {
     try {
       final latestExams = await ApiService().fetchLatestExams();
-      final examDetails = await ApiService().fetchExams();
+      final examDetails = await ApiService().fetchJobs();
 
       setState(() {
         latestExamDetailsList = latestExams ?? [];
-        examDetailsList = examDetails ?? [];
+        jobDetailsList = examDetails ?? [];
         isLoading = false;
       });
     } catch (e) {
@@ -114,7 +116,10 @@ class _ExamsHomeState extends State<ExamsHome> {
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-            BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings',
+            ),
           ],
         ),
       ),

@@ -3,14 +3,12 @@ import 'package:notify/data/exam_details.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ViewDetailsScreen extends StatelessWidget {
-  final ExamDetails examDetail;
+  final JobDetails jobDetails;
 
-  const ViewDetailsScreen({super.key, required this.examDetail});
+  const ViewDetailsScreen({super.key, required this.jobDetails});
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
       appBar: AppBar(title: const Text("Exam Details"), centerTitle: true),
       body: SingleChildScrollView(
@@ -18,19 +16,19 @@ class ViewDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTitleText(examDetail.sector),
+            _buildTitleText(jobDetails.postDate),
             _buildCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildDetailRow(
                     context,
-                    "Posted On",
-                    examDetail.postDate,
-                    Icons.calendar_month,
+                    "Post Board",
+                   jobDetails.postBoard,
+                    Icons.list,
                   ),
                   const SizedBox(height: 10),
-                  _buildContext(context, examDetail.importantDates),
+                  _buildQualificationSection(context, jobDetails.qualifications),
                 ],
               ),
               context: context,
@@ -41,20 +39,23 @@ class ViewDetailsScreen extends StatelessWidget {
                 children: [
                   _buildDetailRow(
                     context,
-                    "Age Limit",
-                    examDetail.ageLimit.isNotEmpty
-                        ? examDetail.ageLimit.join(", ")
-                        : "Not Available",
-                    Icons.person,
+                    "Post Name",
+                    jobDetails.postName,
+                    Icons.bookmark,
                   ),
                   const SizedBox(height: 10),
                   _buildDetailRow(
                     context,
-                    "Qualification",
-                    examDetail.qualifications.isNotEmpty
-                        ? examDetail.qualifications.join(", ")
-                        : "Not Available",
-                    Icons.school,
+                    "Last Date",
+                    jobDetails.lastDate,
+                    Icons.event,
+                  ),
+                  const SizedBox(height: 10),
+                  _buildDetailRow(
+                    context,
+                    "Details Link",
+                    jobDetails.detailsLink,
+                    Icons.link,
                   ),
                 ],
               ),
@@ -62,7 +63,11 @@ class ViewDetailsScreen extends StatelessWidget {
             ),
             _buildCard(
               context: context,
-              child: _buildClickableLinks(context, examDetail.importantLinks),
+              child: _buildClickableLinks(context, jobDetails.applyOnline),
+            ),
+            _buildCard(
+              context: context,
+              child: _buildClickableLinks(context, [jobDetails.officialWebsite]),
             ),
             const SizedBox(height: 20),
             Center(
@@ -71,7 +76,7 @@ class ViewDetailsScreen extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromRGBO(56, 182, 255, 1),
+                    backgroundColor: Theme.of(context).primaryColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -80,10 +85,7 @@ class ViewDetailsScreen extends StatelessWidget {
                       horizontal: 32,
                     ),
                   ),
-                  child: const Text(
-                    "🔔 Notify Me",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
+                  child: const Text("🔔 Notify Me"),
                 ),
               ),
             ),
@@ -128,31 +130,31 @@ class ViewDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContext(BuildContext context, List<String> dates) {
-    if (dates.isEmpty) {
-      return const Text("No Dates Mentioned");
+  Widget _buildQualificationSection(BuildContext context, List<String> qualifications) {
+    if (qualifications.isEmpty) {
+      return const Text("No Qualifications Mentioned");
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          "Important Dates:",
+          "Qualifications:",
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         Column(
-          children: dates.map((date) {
+          children: qualifications.map((qualification) {
             return Padding(
-              padding: EdgeInsets.only(bottom: 4.0),
+              padding: const EdgeInsets.only(bottom: 4.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("• ", style: TextStyle(fontSize: 16)),
+                  const Text("• ", style: TextStyle(fontSize: 16)),
                   Expanded(
                     child: Text(
-                      date,
-                      style: TextStyle(fontSize: 16),
+                      qualification,
+                      style: const TextStyle(fontSize: 16),
                       softWrap: true,
                     ),
                   ),
@@ -186,7 +188,11 @@ class ViewDetailsScreen extends StatelessWidget {
                 onTap: () => _launchURL(link),
                 child: Row(
                   children: [
-                    const Icon(Icons.link, size: 18, color: Colors.blue),
+                    Icon(
+                      Icons.link,
+                      size: 18,
+                      color: Theme.of(context).iconTheme.color,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(

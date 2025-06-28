@@ -11,7 +11,7 @@ class VerticalCardViewExams extends StatefulWidget {
 }
 
 class _VerticalCardViewExamsState extends State<VerticalCardViewExams> {
-  List<ExamDetails> examsList = [];
+  List<JobDetails> examsList = [];
 
   @override
   void initState() {
@@ -21,14 +21,18 @@ class _VerticalCardViewExamsState extends State<VerticalCardViewExams> {
 
   Future<void> _loadExamDetails() async {
     try {
-      List<ExamDetails>? exams = await ApiService().fetchExams().timeout(Duration(seconds: 60));
+      List<JobDetails>? exams = await ApiService().fetchJobs().timeout(
+        Duration(seconds: 60),
+      );
       setState(() {
-        examsList = (exams ?? []).cast<ExamDetails>();
+        examsList = (exams ?? []).cast<JobDetails>();
       });
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Something went wrong! Please try again later.")),
+        const SnackBar(
+          content: Text("Something went wrong! Please try again later."),
+        ),
       );
     }
   }
@@ -51,7 +55,7 @@ class _VerticalCardViewExamsState extends State<VerticalCardViewExams> {
 }
 
 class VerticalExamCardView extends StatelessWidget {
-  final ExamDetails examDetail;
+  final JobDetails examDetail;
 
   const VerticalExamCardView({super.key, required this.examDetail});
 
@@ -70,9 +74,9 @@ class VerticalExamCardView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildRow(Icons.catching_pokemon, "Sector", examDetail.sector),
+            _buildRow(Icons.catching_pokemon, "Sector", examDetail.postBoard),
             _buildRow(Icons.calendar_month, "Posted On", examDetail.postDate),
-            _buildRow(Icons.list, "Status", examDetail.updateInfo),
+            _buildRow(Icons.list, "Last Date", examDetail.lastDate),
             const SizedBox(height: 10),
             FilledButton(
               style: FilledButton.styleFrom(
@@ -85,7 +89,8 @@ class VerticalExamCardView extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ViewDetailsScreen(examDetail: examDetail,),
+                    builder: (context) =>
+                        ViewDetailsScreen(jobDetails: examDetail),
                   ),
                 );
               },

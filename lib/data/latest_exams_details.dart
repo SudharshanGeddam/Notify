@@ -23,17 +23,17 @@ class LatestExamsDetails {
 
   factory LatestExamsDetails.fromJson(Map<String, dynamic> json) {
     return LatestExamsDetails(
-      postDate: json['postDate'] ?? '',
-      postBoard: json['postBoard'] ?? '',
+      postDate: json['postDate'] ?? 'N/A',
+      postBoard: json['postBoard'] ?? 'N/A',
       postName: json['postName'] ?? '',
       qualification: json['qualification'] is List
           ? List<String>.from(json['qualification'])
-          : [json['qualification'] ?? ''],
-      lasteDate: json['lasteDate'] ?? '',
-      link: json['link'] ?? '',
-      applyOnline: json['applyOnline'] ?? '',
-      notificationFile: json['notificationFile'] ?? '',
-      officialWebsite: json['officialWebsite'] ?? '',
+          : [json['qualification'] ?? 'N/A'],
+      lasteDate: json['lasteDate'] ?? 'N/A',
+      link: json['link'] ?? 'N/A',
+      applyOnline: json['applyOnline'] ?? 'N/A',
+      notificationFile: json['notificationFile'] ?? 'N/A',
+      officialWebsite: json['officialWebsite'] ?? 'N/A',
     );
   }
 }

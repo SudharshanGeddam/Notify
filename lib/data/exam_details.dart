@@ -1,53 +1,40 @@
-class ExamDetails {
-  final String sector;
+class JobDetails {
   final String postDate;
   final String postBoard;
   final String postName;
-  final String updateInfo;
+  final String lastDate;
   final String detailsLink;
   final List<String> qualifications;
-  final List<String> applicationFees;
-  final List<String> ageLimit;
-  final List<String> importantDates;
-  final List<String> importantLinks;
+  final String officialWebsite;
+  final List<String> applyOnline;
 
-  ExamDetails({
-    required this.sector,
+  JobDetails({
     required this.postDate,
     required this.postBoard,
     required this.postName,
-    required this.updateInfo,
+    required this.lastDate,
     required this.detailsLink,
     required this.qualifications,
-    required this.applicationFees,
-    required this.ageLimit,
-    required this.importantDates,
-    required this.importantLinks,
+    required this.officialWebsite,
+    required this.applyOnline,
   });
 
-  factory ExamDetails.fromJson(Map<String, dynamic> json) {
-    return ExamDetails(
-      sector: json['sector'] ?? '',
-      postDate: json['postDate'] ?? '',
-      postBoard: json['postBoard'] ?? '',
-      postName: json['postName'] ?? '',
-      updateInfo: json['updateInformation'] ?? '',
-      detailsLink: json['detailLink'] ?? '',
-      applicationFees: json['applicationFee'] is List
-          ? List<String>.from(json['applicationFee'])
-          : [json['applicationFee'] ?? ''],
-      importantDates: json['importantDates'] is List
-          ? List<String>.from(json['importantDates'])
-          : [json['importantDates'] ?? ''],
-      ageLimit: json['ageLimit'] is List
-          ? List<String>.from(json['ageLimit'])
-          : [json['ageLimit'] ?? ''],
-      qualifications: json['qualification'] is List
-          ? List<String>.from(json['qualification'])
-          : [json['qualification'] ?? ''],
-      importantLinks: json['importantLinks'] != null
-          ? List<String>.from((json['importantLinks'] as Map).values)
-          : [],
-    );
-  }
+  factory JobDetails.fromJson(Map<String, dynamic> json) {
+  return JobDetails(
+    postDate: json['postDate'] ?? 'N/A',
+    postBoard: json['postBoard'] ?? 'N/A',
+    postName: json['postName'] ?? 'N/A',
+    lastDate: json['lastDate'] ?? 'N/A',
+    detailsLink: json['detailLink'] ?? 'N/A',
+    qualifications: json['qualification'] is List
+        ? List<String>.from(json['qualification'])
+        : [json['qualification'] ?? 'N/A'],
+    officialWebsite: json['official_website'] ?? 'N/A',
+    applyOnline: json['apply_online'] != null &&
+            json['apply_online'] is Map<String, dynamic>
+        ? List<String>.from((json['apply_online'] as Map).values)
+        : [],
+  );
+}
+
 }
