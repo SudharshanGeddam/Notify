@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:notify/data/exam_details.dart';
+import 'package:notify/data/jobs_data.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ViewDetailsScreen extends StatelessWidget {
-  final JobDetails jobDetails;
+  final JobsData jobDetails;
 
   const ViewDetailsScreen({super.key, required this.jobDetails});
 
@@ -28,7 +28,7 @@ class ViewDetailsScreen extends StatelessWidget {
                     Icons.list,
                   ),
                   const SizedBox(height: 10),
-                  _buildQualificationSection(context, jobDetails.qualifications),
+                  _buildQualificationSection(context, jobDetails.qualification),
                 ],
               ),
               context: context,
@@ -54,7 +54,7 @@ class ViewDetailsScreen extends StatelessWidget {
                   _buildDetailRow(
                     context,
                     "Details Link",
-                    jobDetails.detailsLink,
+                    jobDetails.link,
                     Icons.link,
                   ),
                 ],
@@ -63,7 +63,7 @@ class ViewDetailsScreen extends StatelessWidget {
             ),
             _buildCard(
               context: context,
-              child: _buildClickableLinks(context, jobDetails.applyOnline),
+              child: _buildClickableLinks(context, jobDetails.applyOnline as List<String>),
             ),
             _buildCard(
               context: context,

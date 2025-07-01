@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:notify/data/api_service.dart';
-import 'package:notify/data/latest_exams_details.dart';
+import 'package:notify/data/jobs_data.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 class LatestExamsPageView extends StatefulWidget {
@@ -15,34 +16,37 @@ class LatestExamsPageView extends StatefulWidget {
 class _PageViewJobState extends State<LatestExamsPageView> {
   final PageController _pageController = PageController(viewportFraction: 0.9);
   int _currentIndex = 0;
-  List<LatestExamsDetails> examsList = [];
+  List<JobsData> _jobsList = [];
 
   @override
   void initState() {
     super.initState();
-    _loadExamDetails();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadJobDetails();
+    });
   }
 
-  Future<void> _loadExamDetails() async {
-  try {
-    final exams = await ApiService().fetchLatestExams().timeout(const Duration(seconds: 60));
-    if (!mounted) return; 
-    setState(() {
-     final limitedExams = (exams ?? []).take(10).toList();
-        examsList = limitedExams;
-    });
-  } on TimeoutException {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Request timed out")),
-    );
-  } catch (e) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Something went wrong!")),
-    );
+  Future<void> _loadJobDetails() async {
+    try {
+      final endpoint = '${ApiService.baseUrl}/freejobalert/v1/';
+      final jobs = await ApiService().fetchJobs(endpoint);
+      if (!mounted) return;
+      setState(() {
+        final limitedJobs = (jobs).take(10).toList();
+        _jobsList = limitedJobs;
+      });
+    } on TimeoutException {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Request timed out")));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Something went wrong!")));
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +56,7 @@ class _PageViewJobState extends State<LatestExamsPageView> {
         children: [
           SizedBox(
             height: 150,
-            child: examsList.isEmpty
+            child: _jobsList.isEmpty
                 ? const Center(child: CircularProgressIndicator())
                 : PageView.builder(
                     controller: _pageController,
@@ -61,11 +65,11 @@ class _PageViewJobState extends State<LatestExamsPageView> {
                         _currentIndex = index;
                       });
                     },
-                    itemCount: examsList.length,
+                    itemCount: _jobsList.length,
                     itemBuilder: (context, index) {
                       return SizedBox(
                         height: 160,
-                        child: ExamCard(examDetail: examsList[index]),
+                        child: ExamCard(examDetail: _jobsList[index]),
                       );
                     },
                   ),
@@ -76,7 +80,7 @@ class _PageViewJobState extends State<LatestExamsPageView> {
             spacing: 4,
             runSpacing: 4,
             children: List.generate(
-              examsList.length,
+              _jobsList.length,
               (index) => Container(
                 width: _currentIndex == index ? 10 : 8,
                 height: _currentIndex == index ? 10 : 8,
@@ -96,7 +100,7 @@ class _PageViewJobState extends State<LatestExamsPageView> {
 }
 
 class ExamCard extends StatelessWidget {
-  final LatestExamsDetails examDetail;
+  final JobsData examDetail;
 
   const ExamCard({super.key, required this.examDetail});
 
@@ -119,7 +123,7 @@ class ExamCard extends StatelessWidget {
             children: [
               _buildText("Sector", examDetail.postBoard),
               _buildText("Date Released", examDetail.postDate),
-              _buildText("Last Date", examDetail.lasteDate),
+              _buildText("Last Date", examDetail.lastDate),
               GestureDetector(
                 onTap: () => _openLink(context, examDetail.applyOnline),
                 child: Text(

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:notify/data/api_service.dart';
-import 'package:notify/data/exam_details.dart';
+
+import 'package:notify/data/jobs_data.dart';
 import 'package:notify/screens/view_details_screen.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HomePageView extends StatefulWidget {
   const HomePageView({super.key});
@@ -11,7 +13,8 @@ class HomePageView extends StatefulWidget {
 }
 
 class _HomePageViewState extends State<HomePageView> {
-  List<JobDetails> jobDetailsList = [];
+  List<JobsData> jobDetailsList = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -20,28 +23,51 @@ class _HomePageViewState extends State<HomePageView> {
   }
 
   Future<void> _loadExamDetails() async {
+    print("Api calling");
     try {
-      List<JobDetails>? exams = await ApiService().fetchJobs().timeout(
+      final endpoint = '${ApiService.baseUrl}/freejobalert/v1/';
+      List<JobsData>? exams = await ApiService().fetchJobs(endpoint).timeout(
         const Duration(seconds: 60),
       );
+     
       if (!mounted) return;
       setState(() {
-        jobDetailsList = (exams ?? []).take(10).toList(); // limit to 10
+         print("Api call success");
+        jobDetailsList = (exams).take(10).toList(); // limit to 10
+        isLoading = false;
       });
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please check your Internet connection!")),
       );
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 220, // Required to render horizontal list
-      child: jobDetailsList.isEmpty
-          ? const Center(child: CircularProgressIndicator())
+      height: 220,
+      child: isLoading
+          ? ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: jobDetailsList.length,
+              itemBuilder: (context, index) => Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  height: 300,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            )
           : ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: jobDetailsList.length,
@@ -55,7 +81,7 @@ class _HomePageViewState extends State<HomePageView> {
 }
 
 class HomePageViewLatest extends StatelessWidget {
-  final JobDetails jobDetails;
+  final JobsData jobDetails;
   const HomePageViewLatest({super.key, required this.jobDetails});
 
   @override
@@ -69,54 +95,56 @@ class HomePageViewLatest extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [BoxShadow(blurRadius: 4, offset: const Offset(0, 2))],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildRow(
-            context,
-            Icons.catching_pokemon,
-            "Posted Board",
-            jobDetails.postBoard,
-          ),
-          _buildRow(
-            context,
-            Icons.calendar_month,
-            "Posted On",
-            jobDetails.postDate,
-          ),
-          _buildRow(context, Icons.list, "Last Date", jobDetails.lastDate),
-          _buildRow(
-            context,
-            Icons.list,
-            "Details Link",
-            jobDetails.detailsLink,
-          ),
-          _buildRow(
-            context,
-            Icons.list,
-            "Official Website",
-            jobDetails.officialWebsite,
-          ),
-          const Spacer(),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-              ),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildRow(
+              context,
+              Icons.catching_pokemon,
+              "Posted Board",
+              jobDetails.postBoard,
             ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      ViewDetailsScreen(jobDetails: jobDetails),
+            _buildRow(
+              context,
+              Icons.calendar_month,
+              "Posted On",
+              jobDetails.postDate,
+            ),
+            _buildRow(context, Icons.list, "Last Date", jobDetails.lastDate),
+            _buildRow(
+              context,
+              Icons.list,
+              "Details Link",
+              jobDetails.link,
+            ),
+            _buildRow(
+              context,
+              Icons.list,
+              "Official Website",
+              jobDetails.officialWebsite,
+            ),
+            const SizedBox(height: 10),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
                 ),
-              );
-            },
-            child: const Text("View Details", textAlign: TextAlign.center),
-          ),
-        ],
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ViewDetailsScreen(jobDetails: jobDetails),
+                  ),
+                );
+              },
+              child: const Text("View Details", textAlign: TextAlign.center),
+            ),
+          ],
+        ),
       ),
     );
   }

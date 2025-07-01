@@ -41,6 +41,8 @@ dependencies:
   intl: ^0.20.2
   url_launcher: ^6.3.1
   provider: ^6.1.5
+  shimmer_animation: ^2.2.2
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:

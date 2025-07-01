@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:notify/app_widgets/home_page_view.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +81,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  /// Reusable wide outlined button with leading image and trailing icon
   Widget buildWideOutlinedButton({
     required BuildContext context,
     required VoidCallback onPressed,

@@ -1,16 +1,18 @@
 // File: lib/data/api_service.dart
 
 import 'dart:convert';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:notify/data/exam_details.dart';
-import 'package:notify/data/latest_exams_details.dart';
+import 'package:notify/data/jobs_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   static final http.Client _client = http.Client();
   static final String _baseUrl =
       dotenv.env['API_BASE_URL'] ?? 'http://172.81.133.173:3000';
+
+  static String get baseUrl => _baseUrl;
 
   // Registering the User
   static Future<Map<String, dynamic>?> registerUser(
@@ -99,75 +101,34 @@ class ApiService {
     }
   }
 
-  // Fetching the Jobs
-  Future<List<JobDetails>?> fetchJobs() async {
+  Future<List<JobsData>> fetchJobs(String endpoint) async {
     try {
       final token = await _getToken();
       if (token == null) throw Exception('No access token found');
 
       final response = await _client
           .get(
-            Uri.parse('$_baseUrl/freejobalert/v1/'),
+            Uri.parse(endpoint),
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $token',
             },
           )
-          .timeout(const Duration(seconds: 120));
-
-      if (response.statusCode == 200) {
-        final jsonBody = json.decode(response.body);
-
-        if (jsonBody is Map<String, dynamic> && jsonBody['data'] is List) {
-          final List<dynamic> jobsRaw = jsonBody['data'];
-
-          // Safely map only if each item is a Map
-          return jobsRaw.whereType<Map<String, dynamic>>().map((item) {
-            return JobDetails.fromJson(item);
-          }).toList();
-        } else {
-          throw Exception('Unexpected data format from API');
-        }
-      }
-    } catch (e) {
-      print('Error fetching jobs: $e');
-      return null;
-    }
-    return null;
-  }
-
-  // Fetching the latest the Exam notifications
-  Future<List<LatestExamsDetails>?> fetchLatestExams() async {
-    try {
-      final token = await _getToken();
-      if (token == null) throw Exception('No access token found');
-
-      final response = await _client
-          .get(
-            Uri.parse('$_baseUrl/freejobalert/v1/latest-edu'),
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer $token',
-            },
-          )
-          .timeout(const Duration(seconds: 120));
+          .timeout(const Duration(seconds: 60));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
         if (data['success'] == true) {
           final List<dynamic> jsonData = data['data'];
-          return jsonData
-              .map((item) => LatestExamsDetails.fromJson(item))
-              .toList();
+          return jsonData.map((item) => JobsData.fromJson(item)).toList();
         } else {
-          throw Exception('API returned success = false');
+          throw Exception('API returned success == false');
         }
       } else {
-        throw Exception('HTTP Error: ${response.statusCode}');
+        throw Exception('HTTP Error:${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching latest exams: $e');
-      return null;
+      throw Exception("Error in fetching data: $e");
     }
   }
 
