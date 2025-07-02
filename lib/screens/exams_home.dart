@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notify/app_widgets/filter_list_view.dart';
-import 'package:notify/app_widgets/latest_exams_page_view.dart';
+import 'package:notify/app_widgets/home_page_view.dart';
 import 'package:notify/data/api_service.dart';
 import 'package:notify/data/filters_data.dart';
 import 'package:notify/data/jobs_data.dart';
@@ -49,49 +49,60 @@ class _ExamsHomeState extends State<ExamsHome> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(title: const Text('Exams')),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              Text(
-                'Trending on Notify...🔥',
-                style: Theme.of(context).textTheme.titleMedium,
+        appBar: AppBar(title: const Text('Exam Notifications')),
+        body: SizedBox.expand(
+          child: Stack(
+            children:
+            [
+               Positioned.fill(
+                child: Image.asset('assets/images/auth_bg.jpg', fit: BoxFit.cover,),
               ),
-              LatestExamsPageView(),
-              const SizedBox(height: 10),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search for exams...',
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0),
+               SingleChildScrollView(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  Text(
+                    'Recently Release',
+                    style: Theme.of(context).textTheme.titleSmall,
                   ),
-                ),
-                onChanged: (query) {
-                  // Optional: Implement search functionality here.
-                },
+                  const HomePageView(),
+                  const SizedBox(height: 10),
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Search for exams...',
+                      fillColor: Colors.white,
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    onChanged: (query) {
+                      // Optional: Implement search functionality here.
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  FilterListView(
+                    filters: filters,
+                    onFilterSelected: (String selected) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        loadJobsForFilter(selected);
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: _jobList.length,
+                    itemBuilder: (context, index) {
+                      return VerticalCardViewForJobs(jobs: _jobList[index]);
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: 10),
-              FilterListView(
-                filters: filters,
-                onFilterSelected: (String selected) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    loadJobsForFilter(selected);
-                  });
-                },
-              ),
-              const SizedBox(height: 10),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: _jobList.length,
-                itemBuilder: (context, index) {
-                  return VerticalCardViewForJobs(jobs: _jobList[index]);
-                },
-              ),
+            ),
             ],
           ),
         ),
@@ -152,11 +163,16 @@ class VerticalCardViewForJobs extends StatelessWidget {
             _buildRow(Icons.list, "Last Date", jobs.lastDate),
             const SizedBox(height: 10),
             FilledButton(
+            
               style: FilledButton.styleFrom(
+              
                 backgroundColor: const Color.fromRGBO(56, 182, 255, 1),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
+                
                 ),
+                minimumSize: Size(300, 40),
+            
               ),
               onPressed: () {
                 Navigator.push(

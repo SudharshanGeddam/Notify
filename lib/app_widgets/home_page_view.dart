@@ -3,7 +3,7 @@ import 'package:notify/data/api_service.dart';
 
 import 'package:notify/data/jobs_data.dart';
 import 'package:notify/screens/view_details_screen.dart';
-import 'package:shimmer/shimmer.dart';
+
 
 class HomePageView extends StatefulWidget {
   const HomePageView({super.key});
@@ -49,34 +49,19 @@ class _HomePageViewState extends State<HomePageView> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 220,
-      child: isLoading
-          ? ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: jobDetailsList.length,
-              itemBuilder: (context, index) => Shimmer.fromColors(
-                baseColor: Colors.grey[300]!,
-                highlightColor: Colors.grey[100]!,
-                child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  height: 300,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-            )
-          : ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: jobDetailsList.length,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemBuilder: (context, index) {
-                return HomePageViewLatest(jobDetails: jobDetailsList[index]);
-              },
+    return 
+      SizedBox(
+        height: 180,
+        child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: jobDetailsList.length,
+                padding: const EdgeInsets.all(10.0),
+                itemBuilder: (context, index) {
+                  return HomePageViewLatest(jobDetails: jobDetailsList[index]);
+                },
+             
             ),
-    );
+      );
   }
 }
 
@@ -87,13 +72,13 @@ class HomePageViewLatest extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 300, // Needed for horizontal card display
+      width: 250, // Needed for horizontal card display
       margin: const EdgeInsets.only(right: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [BoxShadow(blurRadius: 4, offset: const Offset(0, 2))],
+        boxShadow: [BoxShadow(blurRadius: 4, offset: const Offset(0, 1))],
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -112,18 +97,7 @@ class HomePageViewLatest extends StatelessWidget {
               jobDetails.postDate,
             ),
             _buildRow(context, Icons.list, "Last Date", jobDetails.lastDate),
-            _buildRow(
-              context,
-              Icons.list,
-              "Details Link",
-              jobDetails.link,
-            ),
-            _buildRow(
-              context,
-              Icons.list,
-              "Official Website",
-              jobDetails.officialWebsite,
-            ),
+
             const SizedBox(height: 10),
             FilledButton(
               style: FilledButton.styleFrom(

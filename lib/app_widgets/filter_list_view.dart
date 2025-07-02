@@ -31,7 +31,7 @@ class _FilterListViewState extends State<FilterListView> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 50,
+      height: 40,
       child: ListView.builder(
         itemCount: widget.filters.length,
         scrollDirection: Axis.horizontal,
@@ -51,13 +51,10 @@ class _FilterListViewState extends State<FilterListView> {
                 label: Text(filter),
                 backgroundColor: selectedFilter == filter
                     ? Color.fromRGBO(2, 129, 255, 1)
-                    : Color.fromRGBO(212, 219, 225, 1),
+                    : Colors.white,
                 side: BorderSide(color: Color.fromRGBO(212, 219, 225, 1)),
-                labelStyle: TextStyle(fontSize: 16.0),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 25.0,
-                  vertical: 15.0,
-                ),
+                labelStyle: TextStyle(fontSize: 14.0),
+                padding: const EdgeInsets.all(8.0),
                
               ),
             ),

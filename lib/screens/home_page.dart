@@ -26,54 +26,64 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Hello! Welcome to Notify 👋',
-                style: Theme.of(context).textTheme.titleMedium,
-                textAlign: TextAlign.center,
+        body: SizedBox.expand(
+          child: Stack(
+            children: 
+            [
+               Positioned.fill(
+              child: Image.asset('assets/images/auth_bg.jpg', fit: BoxFit.cover,),
+            ),
+              SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Hello! Welcome to Notify 👋',
+                    style: Theme.of(context).textTheme.titleMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  const HomePageView(),
+                  const SizedBox(height: 30),
+            
+                  // Exams Button
+                  buildWideOutlinedButton(
+                    context: context,
+                    label: 'Exams',
+                    imagePath: 'assets/images/exams.jpg',
+                    trailingIcon: Icons.arrow_forward_ios,
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/exams');
+                    },
+                  ),
+                  const SizedBox(height: 20),
+            
+                  // Sports Button
+                  buildWideOutlinedButton(
+                    context: context,
+                    label: 'Sports',
+                    imagePath: 'assets/images/sports.jpg',
+                    trailingIcon: Icons.arrow_forward_ios,
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/sports');
+                    },
+                  ),
+                  const SizedBox(height: 20),
+            
+                  // Roadmaps Button
+                  buildWideOutlinedButton(
+                    context: context,
+                    label: 'Roadmaps',
+                    imagePath: 'assets/images/roadmaps.jpg',
+                    trailingIcon: Icons.arrow_forward_ios,
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/roadmaps');
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-              const HomePageView(),
-              const SizedBox(height: 30),
-
-              // Exams Button
-              buildWideOutlinedButton(
-                context: context,
-                label: 'Exams',
-                imagePath: 'assets/images/exams.jpg',
-                trailingIcon: Icons.arrow_forward_ios,
-                onPressed: () {
-                  Navigator.pushNamed(context, '/exams');
-                },
-              ),
-              const SizedBox(height: 20),
-
-              // Sports Button
-              buildWideOutlinedButton(
-                context: context,
-                label: 'Sports',
-                imagePath: 'assets/images/sports.jpg',
-                trailingIcon: Icons.arrow_forward_ios,
-                onPressed: () {
-                  Navigator.pushNamed(context, '/sports');
-                },
-              ),
-              const SizedBox(height: 20),
-
-              // Roadmaps Button
-              buildWideOutlinedButton(
-                context: context,
-                label: 'Roadmaps',
-                imagePath: 'assets/images/roadmaps.jpg',
-                trailingIcon: Icons.arrow_forward_ios,
-                onPressed: () {
-                  Navigator.pushNamed(context, '/roadmaps');
-                },
-              ),
+            ),
             ],
           ),
         ),
@@ -95,6 +105,7 @@ class _HomePageState extends State<HomePage> {
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
           side: BorderSide(color: Theme.of(context).colorScheme.primary),
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
