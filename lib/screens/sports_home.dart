@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
-
-import 'package:notify/app_widgets/filter_list_view.dart';
-
-import 'package:notify/app_widgets/latest_sports_card.dart';
-import 'package:notify/app_widgets/sports_card_vertical.dart';
-
-import 'package:notify/data/filters_data.dart';
-
-import 'package:notify/data/latest_sports_details.dart';
-import 'package:notify/data/sports_details.dart';
+import 'package:notify/data/sports_data.dart';
+import 'package:notify/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SportsHome extends StatefulWidget {
   const SportsHome({super.key});
@@ -22,73 +16,56 @@ class _SportsHomeState extends State<SportsHome> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Provider.of<ThemeProvider>(context).isDarkTheme;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(title: const Text('Sports')),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+        body: SizedBox.expand(
+          child: Stack(
             children: [
-              const SizedBox(height: 20),
-              Text(
-                textAlign: TextAlign.start,
-                'Trending on Notify...🔥',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              SizedBox(
-                height: 200,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: latestsportsDetails.length,
-
-                  itemBuilder: (context, index) {
-                    final sports = latestsportsDetails[index];
-                    return LatestSportsCard(
-                      sportName: sports['title'] ?? 'No Title',
-                      sportDate: sports['date'] ?? 'No Date',
-                      sportTime: sports['time'] ?? 'No Time',
-                      sportDescription:
-                          sports['description'] ?? 'No Description',
-                      onTap: () {},
-                    );
-                  },
+              Positioned.fill(
+                child: Image.asset(
+                  isDark
+                      ? 'assets/images/dark_bg.png'
+                      : 'assets/images/auth_bg.jpg',
+                  fit: BoxFit.cover,
                 ),
               ),
-              const SizedBox(height: 10),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search for sports...',
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              FilterListView(
-                filters: filters,
-                onFilterSelected: (String selected) {},
-              ),
-              const SizedBox(height: 10),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: sportsDetails.length,
+              ListView.separated(
+                padding: const EdgeInsets.all(12),
+                itemCount: sportsAuthorities.length,
+                separatorBuilder: (_, _) => const Divider(),
                 itemBuilder: (context, index) {
-                  final sports = sportsDetails[index];
-                  return SportsCardVertical(
-                    sportName: sports['title'] ?? 'No Title',
-                    sportDate: sports['date'] ?? 'No Date',
-                    sportTime: sports['time'] ?? 'No Time',
-                    sportDescription: sports['description'] ?? 'No Description',
-                    onTap: () {},
+                  final authority = sportsAuthorities[index];
+                  return ListTile(
+                    title: Text(authority.state),
+                    subtitle: Text(authority.authorityName),
+                    trailing: const Icon(Icons.launch),
+                    onTap: () async {
+                      final uri = Uri.parse(authority.website);
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(
+                          uri,
+                          mode: LaunchMode.externalApplication,
+                        );
+                      } else {
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Could not launch ${authority.website}",
+                            ),
+                          ),
+                        );
+                      }
+                    },
                   );
                 },
               ),
             ],
           ),
         ),
+
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: currentPage,
           onTap: (index) {

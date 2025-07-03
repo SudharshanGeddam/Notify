@@ -18,22 +18,23 @@ class ViewDetailsScreen extends StatelessWidget {
           children: [
             _buildTitleText(jobDetails.postDate),
             _buildCard(
+              context: context,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildDetailRow(
                     context,
                     "Post Board",
-                   jobDetails.postBoard,
+                    jobDetails.postBoard,
                     Icons.list,
                   ),
                   const SizedBox(height: 10),
                   _buildQualificationSection(context, jobDetails.qualification),
                 ],
               ),
-              context: context,
             ),
             _buildCard(
+              context: context,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -59,22 +60,23 @@ class ViewDetailsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              context: context,
             ),
             _buildCard(
               context: context,
-              child: _buildClickableLinks(context, jobDetails.applyOnline as List<String>),
-            ),
-            _buildCard(
-              context: context,
-              child: _buildClickableLinks(context, [jobDetails.officialWebsite]),
+              child: _buildLabeledLinks(context, {
+                for (var i = 0; i < jobDetails.applyOnline.length; i++)
+                  "Apply Link ${i + 1}": jobDetails.applyOnline[i],
+                "Official Website": jobDetails.officialWebsite,
+              }, title: "Important Links"),
             ),
             const SizedBox(height: 20),
             Center(
               child: SizedBox(
                 width: 300,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    // TODO: Add notify logic
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).primaryColor,
                     shape: RoundedRectangleBorder(
@@ -85,7 +87,10 @@ class ViewDetailsScreen extends StatelessWidget {
                       horizontal: 32,
                     ),
                   ),
-                  child: const Text("🔔 Notify Me"),
+                  child: Text(
+                    "🔔 Notify Me",
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
                 ),
               ),
             ),
@@ -130,7 +135,10 @@ class ViewDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQualificationSection(BuildContext context, List<String> qualifications) {
+  Widget _buildQualificationSection(
+    BuildContext context,
+    List<String> qualifications,
+  ) {
     if (qualifications.isEmpty) {
       return const Text("No Qualifications Mentioned");
     }
@@ -167,25 +175,29 @@ class ViewDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildClickableLinks(BuildContext context, List<String> links) {
-    if (links.isEmpty) {
+  Widget _buildLabeledLinks(
+    BuildContext context,
+    Map<String, String> labeledLinks, {
+    required String title,
+  }) {
+    if (labeledLinks.isEmpty) {
       return const Text("No Important Links Available");
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Important Links:",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         Column(
-          children: links.map((link) {
+          children: labeledLinks.entries.map((entry) {
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: GestureDetector(
-                onTap: () => _launchURL(link),
+                onTap: () => _launchURL(entry.value),
                 child: Row(
                   children: [
                     Icon(
@@ -196,7 +208,7 @@ class ViewDetailsScreen extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        link,
+                        entry.key,
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.blue,
@@ -224,12 +236,12 @@ class ViewDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildCard({required Widget child, required BuildContext context}) {
-    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: isDarkMode ? Colors.white : Colors.black),
+        side: BorderSide(color: isDark ? Colors.white : Colors.black),
       ),
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(padding: const EdgeInsets.all(16), child: child),

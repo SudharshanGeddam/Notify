@@ -15,8 +15,10 @@ final lightTheme = ThemeData(
       color: Colors.black,
     ),
   ),
-  colorScheme: ColorScheme.fromSeed(seedColor: Color.fromRGBO(56, 182, 255, 1),
-  brightness: Brightness.light),
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: Color.fromRGBO(56, 182, 255, 1),
+    brightness: Brightness.light,
+  ),
   inputDecorationTheme: InputDecorationTheme(
     filled: true,
     fillColor: Colors.grey[500],
@@ -35,7 +37,7 @@ final lightTheme = ThemeData(
     ),
   ),
   iconTheme: const IconThemeData(color: Colors.black),
-  cardColor:  Color.fromRGBO(210, 239, 255, 1),
+  cardColor: Color.fromRGBO(210, 239, 255, 1),
   useMaterial3: true,
   fontFamily: 'Poppins',
 );
@@ -54,8 +56,10 @@ final darkTheme = ThemeData(
       color: Colors.white,
     ),
   ),
-  colorScheme: ColorScheme.fromSeed(seedColor: Color.fromRGBO(56, 182, 255, 1),
-  brightness: Brightness.dark),
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: Color.fromRGBO(56, 182, 255, 1),
+    brightness: Brightness.dark,
+  ),
   inputDecorationTheme: const InputDecorationTheme(
     filled: true,
     fillColor: Color.fromARGB(255, 30, 30, 30),

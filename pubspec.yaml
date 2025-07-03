@@ -43,6 +43,7 @@ dependencies:
   provider: ^6.1.5
   shimmer_animation: ^2.2.2
   shimmer: ^3.0.0
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +60,12 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+flutter_launcher_icons:
+  android: true
+  iOS: true
+  image_path: 'assets/icons/app_icon.jpg'
+  adaptive_icon_background: "#ffffff"
+
 flutter:
 
   # The following line ensures that the Material Icons font is
@@ -69,7 +76,11 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    - assets/icons/
     - .env
+
+
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

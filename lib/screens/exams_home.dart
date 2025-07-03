@@ -5,6 +5,8 @@ import 'package:notify/data/api_service.dart';
 import 'package:notify/data/filters_data.dart';
 import 'package:notify/data/jobs_data.dart';
 import 'package:notify/screens/view_details_screen.dart';
+import 'package:notify/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class ExamsHome extends StatefulWidget {
   const ExamsHome({super.key});
@@ -47,62 +49,67 @@ class _ExamsHomeState extends State<ExamsHome> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Provider.of<ThemeProvider>(context).isDarkTheme;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(title: const Text('Exam Notifications')),
         body: SizedBox.expand(
           child: Stack(
-            children:
-            [
-               Positioned.fill(
-                child: Image.asset('assets/images/auth_bg.jpg', fit: BoxFit.cover,),
+            children: [
+              Positioned.fill(
+                child: Image.asset(
+                  isDark
+                      ? 'assets/images/dark_bg.png'
+                      : 'assets/images/auth_bg.jpg',
+                  fit: BoxFit.cover,
+                ),
               ),
-               SingleChildScrollView(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  Text(
-                    'Recently Release',
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  const HomePageView(),
-                  const SizedBox(height: 10),
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Search for exams...',
-                      fillColor: Colors.white,
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
+              SingleChildScrollView(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    Text(
+                      'Recently Release',
+                      style: Theme.of(context).textTheme.titleSmall,
                     ),
-                    onChanged: (query) {
-                      // Optional: Implement search functionality here.
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  FilterListView(
-                    filters: filters,
-                    onFilterSelected: (String selected) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        loadJobsForFilter(selected);
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: _jobList.length,
-                    itemBuilder: (context, index) {
-                      return VerticalCardViewForJobs(jobs: _jobList[index]);
-                    },
-                  ),
-                ],
+                    const HomePageView(),
+                    const SizedBox(height: 10),
+                    TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Search for exams...',
+                        fillColor: Colors.white,
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                      onChanged: (query) {
+                        // Optional: Implement search functionality here.
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    FilterListView(
+                      filters: filters,
+                      onFilterSelected: (String selected) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          loadJobsForFilter(selected);
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: _jobList.length,
+                      itemBuilder: (context, index) {
+                        return VerticalCardViewForJobs(jobs: _jobList[index]);
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
             ],
           ),
         ),
@@ -145,11 +152,13 @@ class VerticalCardViewForJobs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Provider.of<ThemeProvider>(context).isDarkTheme;
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
         side: const BorderSide(color: Colors.grey),
       ),
+      color: isDark ? Color.fromRGBO(229, 244, 255, 1) : Colors.white,
       elevation: 3,
       margin: const EdgeInsets.all(12),
       child: Padding(
@@ -162,27 +171,25 @@ class VerticalCardViewForJobs extends StatelessWidget {
             _buildRow(Icons.calendar_month, "Posted On", jobs.postDate),
             _buildRow(Icons.list, "Last Date", jobs.lastDate),
             const SizedBox(height: 10),
-            FilledButton(
-            
-              style: FilledButton.styleFrom(
-              
-                backgroundColor: const Color.fromRGBO(56, 182, 255, 1),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                
-                ),
-                minimumSize: Size(300, 40),
-            
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ViewDetailsScreen(jobDetails: jobs),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(56, 182, 255, 1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
                   ),
-                );
-              },
-              child: const Text("View Details", textAlign: TextAlign.center),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ViewDetailsScreen(jobDetails: jobs),
+                    ),
+                  );
+                },
+                child: const Text("View Details", textAlign: TextAlign.center),
+              ),
             ),
           ],
         ),

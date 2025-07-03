@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:notify/data/api_service.dart';
-
 import 'package:notify/data/jobs_data.dart';
 import 'package:notify/screens/view_details_screen.dart';
-
+import 'package:notify/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomePageView extends StatefulWidget {
   const HomePageView({super.key});
@@ -26,17 +26,18 @@ class _HomePageViewState extends State<HomePageView> {
     print("Api calling");
     try {
       final endpoint = '${ApiService.baseUrl}/freejobalert/v1/';
-      List<JobsData>? exams = await ApiService().fetchJobs(endpoint).timeout(
-        const Duration(seconds: 60),
-      );
-     
+      List<JobsData>? exams = await ApiService()
+          .fetchJobs(endpoint)
+          .timeout(const Duration(seconds: 60));
+
       if (!mounted) return;
       setState(() {
-         print("Api call success");
+        print("Api call success");
         jobDetailsList = (exams).take(10).toList(); // limit to 10
         isLoading = false;
       });
     } catch (e) {
+      print('Error $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please check your Internet connection!")),
@@ -49,19 +50,17 @@ class _HomePageViewState extends State<HomePageView> {
 
   @override
   Widget build(BuildContext context) {
-    return 
-      SizedBox(
-        height: 180,
-        child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: jobDetailsList.length,
-                padding: const EdgeInsets.all(10.0),
-                itemBuilder: (context, index) {
-                  return HomePageViewLatest(jobDetails: jobDetailsList[index]);
-                },
-             
-            ),
-      );
+    return SizedBox(
+      height: 200,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: jobDetailsList.length,
+        padding: const EdgeInsets.all(10.0),
+        itemBuilder: (context, index) {
+          return HomePageViewLatest(jobDetails: jobDetailsList[index]);
+        },
+      ),
+    );
   }
 }
 
@@ -71,12 +70,13 @@ class HomePageViewLatest extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Provider.of<ThemeProvider>(context).isDarkTheme;
     return Container(
       width: 250, // Needed for horizontal card display
       margin: const EdgeInsets.only(right: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? Color.fromRGBO(229, 244, 255, 1) : Colors.white,
         borderRadius: BorderRadius.circular(10),
         boxShadow: [BoxShadow(blurRadius: 4, offset: const Offset(0, 1))],
       ),
@@ -133,7 +133,7 @@ class HomePageViewLatest extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: Theme.of(context).iconTheme.color),
+          Icon(icon, size: 16, color: Colors.black),
           const SizedBox(width: 10),
           Expanded(child: _buildText(context, title, value)),
         ],
@@ -144,10 +144,7 @@ class HomePageViewLatest extends StatelessWidget {
   Widget _buildText(BuildContext context, String title, String value) {
     return RichText(
       text: TextSpan(
-        style: TextStyle(
-          fontSize: 14,
-          color: Theme.of(context).textTheme.bodyLarge?.color,
-        ),
+        style: TextStyle(fontSize: 14, color: Colors.black),
         children: [
           TextSpan(
             text: "$title: ",

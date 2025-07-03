@@ -1,4 +1,12 @@
-final List<String> filters = ['All', 'State Jobs', 'Bank Jobs', 'Teaching Jobs', 'Engineering Jobs', 'Railway Jobs', 'Defense Jobs'];
+final List<String> filters = [
+  'All',
+  'State Jobs',
+  'Bank Jobs',
+  'Teaching Jobs',
+  'Engineering Jobs',
+  'Railway Jobs',
+  'Defense Jobs',
+];
 final Map<String, String> filterPaths = {
   'All': '/freejobalert/v1/gov/other-all-india-exam',
   'State Jobs': '/freejobalert/v1/gov/state/',

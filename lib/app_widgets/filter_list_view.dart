@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:notify/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class FilterListView extends StatefulWidget {
   const FilterListView({
@@ -30,6 +32,7 @@ class _FilterListViewState extends State<FilterListView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Provider.of<ThemeProvider>(context).isDarkTheme;
     return SizedBox(
       height: 40,
       child: ListView.builder(
@@ -50,12 +53,15 @@ class _FilterListViewState extends State<FilterListView> {
               child: Chip(
                 label: Text(filter),
                 backgroundColor: selectedFilter == filter
-                    ? Color.fromRGBO(2, 129, 255, 1)
+                    ? isDark
+                          ? Color.fromRGBO(56, 182, 255, 1)
+                          : Color.fromRGBO(2, 129, 255, 1)
+                    : isDark
+                    ? Colors.black
                     : Colors.white,
                 side: BorderSide(color: Color.fromRGBO(212, 219, 225, 1)),
                 labelStyle: TextStyle(fontSize: 14.0),
                 padding: const EdgeInsets.all(8.0),
-               
               ),
             ),
           );

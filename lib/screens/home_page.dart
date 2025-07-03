@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notify/app_widgets/home_page_view.dart';
+import 'package:notify/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,10 +11,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
- 
-
   @override
   Widget build(BuildContext context) {
+    final isDark = Provider.of<ThemeProvider>(context).isDarkTheme;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -28,62 +29,83 @@ class _HomePageState extends State<HomePage> {
         ),
         body: SizedBox.expand(
           child: Stack(
-            children: 
-            [
-               Positioned.fill(
-              child: Image.asset('assets/images/auth_bg.jpg', fit: BoxFit.cover,),
-            ),
-              SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'Hello! Welcome to Notify 👋',
-                    style: Theme.of(context).textTheme.titleMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20),
-                  const HomePageView(),
-                  const SizedBox(height: 30),
-            
-                  // Exams Button
-                  buildWideOutlinedButton(
-                    context: context,
-                    label: 'Exams',
-                    imagePath: 'assets/images/exams.jpg',
-                    trailingIcon: Icons.arrow_forward_ios,
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/exams');
-                    },
-                  ),
-                  const SizedBox(height: 20),
-            
-                  // Sports Button
-                  buildWideOutlinedButton(
-                    context: context,
-                    label: 'Sports',
-                    imagePath: 'assets/images/sports.jpg',
-                    trailingIcon: Icons.arrow_forward_ios,
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/sports');
-                    },
-                  ),
-                  const SizedBox(height: 20),
-            
-                  // Roadmaps Button
-                  buildWideOutlinedButton(
-                    context: context,
-                    label: 'Roadmaps',
-                    imagePath: 'assets/images/roadmaps.jpg',
-                    trailingIcon: Icons.arrow_forward_ios,
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/roadmaps');
-                    },
-                  ),
-                ],
+            children: [
+              Positioned.fill(
+                child: Image.asset(
+                  isDark
+                      ? 'assets/images/dark_bg.png'
+                      : 'assets/images/auth_bg.jpg',
+                  key: ValueKey<bool>(isDark),
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
+              SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 16,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Hello! Welcome to Notify 👋',
+                      style: Theme.of(context).textTheme.titleMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    const HomePageView(),
+                    const SizedBox(height: 30),
+
+                    // Exams Button
+                    Align(
+                      alignment: Alignment.center,
+                      child: buildWideOutlinedButton(
+                        context: context,
+                        isDarkTheme: isDark,
+                        label: 'Exams',
+                        imagePath: 'assets/images/exams.jpg',
+                        trailingIcon: Icons.arrow_forward_ios,
+
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/exams');
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Sports Button
+                    Align(
+                      alignment: Alignment.center,
+                      child: buildWideOutlinedButton(
+                        context: context,
+                        isDarkTheme: isDark,
+                        label: 'Sports',
+                        imagePath: 'assets/images/sports.jpg',
+                        trailingIcon: Icons.arrow_forward_ios,
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/sports');
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Roadmaps Button
+                    Align(
+                      alignment: Alignment.center,
+                      child: buildWideOutlinedButton(
+                        context: context,
+                        isDarkTheme: isDark,
+                        label: 'Roadmaps',
+                        imagePath: 'assets/images/roadmaps.jpg',
+                        trailingIcon: Icons.arrow_forward_ios,
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/roadmaps');
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -97,6 +119,7 @@ class _HomePageState extends State<HomePage> {
     required String label,
     required String imagePath,
     required IconData trailingIcon,
+    required bool isDarkTheme,
   }) {
     return SizedBox(
       width: 300,
@@ -105,7 +128,7 @@ class _HomePageState extends State<HomePage> {
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
           side: BorderSide(color: Theme.of(context).colorScheme.primary),
-          backgroundColor: Colors.white,
+          backgroundColor: isDarkTheme ? Colors.black : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
